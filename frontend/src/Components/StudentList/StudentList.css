@@ -1,0 +1,76 @@
+.list--header{
+    display:flex;
+    margin:2rem 0;
+    justify-content: space-between;
+}
+.list--header h2{
+    color:#526d82;
+}
+.list--header select{
+    border-radius: 10px;
+    border:none;
+    padding:8px 12px;
+    border:1px solid #dde6ed;
+    color:#526d82;
+}
+.list--container{
+    display:flex;
+    padding-right:10px;
+    align-items: center;
+    justify-content: space-between;
+    transition: 0,3s ease-in-out;
+}
+.list{
+    display: flex;
+    padding-right:10px;
+    align-items: center;
+    justify-content: space-between;
+    transition: 0.3s ease-in-out;
+}
+.student--detail{
+    display:flex;
+    align-items: center;
+    gap:20px;
+    color:#526d82;
+}
+.student--detail img{
+    width: 50px;
+    background: #dde6ed;
+    border-radius: 50%;
+}
+.list:hover{
+    background: #dde6ed;
+    border-radius:10px;
+} 
+.delete-selected-btn {
+    background-color: red; /* Màu nền đỏ */
+    color: white; /* Màu chữ trắng */
+    padding: 10px 20px;
+    border:none; /* Không có đường viền */
+    border-radius: 10px; /* Bo tròn các góc */
+    cursor: pointer; /* Con trỏ chuột chỉ định */
+    width: fit-content; /* Độ rộng phù hợp với nội dung */
+    float:right;
+    margin:20px 0px 20px 0px;
+}
+.student-list-container {
+    display: flex; /* Sử dụng flexbox để tạo layout hai cột */
+    border-radius: 20px;
+
+}
+
+
+.datatable-container-70 {
+    flex: 7; /* Phần này sẽ chiếm 70% chiều rộng của container */
+    padding: 20px; 
+}
+
+.datatable-container-100 {
+    flex: 1;
+    padding: 20px; 
+}
+.profile-container {
+    flex: 3;
+    padding:15px;
+
+}

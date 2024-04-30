@@ -1,0 +1,112 @@
+.profile{
+    flex:1;
+}
+.profile--header{
+    display:flex;
+    align-items:center;
+    justify-content: space-bet
+}
+.edit{
+    background-color: #dde6ed;
+    padding:12px;
+    border-radius: 10px;
+    color:#969393;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+}
+.edit .icon{
+    font-size: 20px;
+    transition: 0.5s ease-in-out;
+}
+.user--profile{
+    height: 85%;
+    margin-top:2rem;
+    border-radius: 10px;
+    background:#dde6ed;
+    flex-direction: column;
+    display: flex;
+    padding:10px;
+}
+.user--detail{
+    width: 100%;
+    height: 450px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+.user--detail img{
+    background: #fff;
+    border-radius: 50%;
+    width: 150px;
+    margin-bottom: 10px;
+}
+.user--detail .username{
+    color:#526d82;
+
+
+}
+.user-courses{
+    background:#fff;
+    flex:1;
+    border-radius: 10px;
+    padding:10px;
+    display:flex;
+    flex-direction: column;
+    gap:10px;
+    
+}
+.course{
+    background: #dde6ed;
+    padding:10px;
+    display:flex;
+    align-items: center;
+    justify-content:space-between;
+    border-radius: 10px;
+    gap:10px;
+}
+.course-detail{
+    display:flex;
+    gap:20px;
+    align-items:center;
+}
+.course-cover{
+    background: #fff;
+    width:40px;
+    height: 40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    font-size:20px;
+}
+.course .duration{
+    font-size:12px;
+
+}
+.course .action{
+    font-weight: 900;
+    font-size:1.2rem;
+}
+.profile_uid{
+    color: #969696;
+}
+.profile_info {
+    padding: 10px; 
+}
+
+.profile_info div {
+    margin-bottom: 10px; /* Khoảng cách giữa các mục */
+    display: flex; /* Sử dụng flexbox để canh trái nhãn và nội dung */
+    align-items: center; /* Căn giữa nội dung */
+   
+}
+
+.profile_info div strong {
+    width: 80px; /* Chiều rộng cố định cho nhãn */
+    text-align: left; /* Canh trái nhãn */
+
+    color: black; 
+    font-weight: bold;
+}
