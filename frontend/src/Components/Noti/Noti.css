@@ -1,0 +1,32 @@
+
+.notification {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px; /* Điều chỉnh padding */
+    border-radius: 5px; /* Điều chỉnh border-radius */
+    color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Thêm bóng đổ */
+}
+
+.notification.success {
+    background-color: #4caf50; /* Xanh lục */
+}
+
+.notification.error {
+    background-color: #f44336; /* Đỏ */
+}
+
+.notification.info {
+    background-color: #2196f3; /* Xanh dương */
+}
+
+.close-button {
+    margin-left: 10px;
+    cursor: pointer;
+    color: white; 
+    background: none;
+    border: none;
+    font-size: 20px; 
+}

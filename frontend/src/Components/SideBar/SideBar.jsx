@@ -1,48 +1,40 @@
 import React from "react";
-import '../SideBar/SideBar.css'
+import { Link } from "react-router-dom";
+import "../SideBar/SideBar.css";
 import {
-  BiHome,
-  BiBookAlt,
-  BiSolidReport,
-  BiStats,
-  BiTask,
-  BiMessage,
-  BiHelpCircle,
+    BiHome,
+    BiBookAlt,
+    BiSolidReport,
+    BiStats,
+    BiTask,
+    BiMessage,
+    BiHelpCircle,
 } from "react-icons/bi";
+
 const SideBar = () => {
-  return (
-    <div className="menu">
-      <div className="logo">
-          <BiBookAlt />
-          <h2>CheckIO</h2>
+    return (
+        <div className="menu">
+            <div className="logo">
+                <BiBookAlt />
+                <h2>CheckIO</h2>
+            </div>
+            <div className="menu--list">
+                <Link to="/home/content" className="item">
+                    <BiHome className="icon" />
+                    Check In
+                </Link>
+                <Link to="/home/create" className="item">
+                    <BiTask className="icon" />
+                    Create
+                </Link>
+                <Link to="/home/account" className="item">
+                    <BiSolidReport className="icon" />
+                    Books Collection
+                </Link>
+               
+            </div>
         </div>
-        <div className="menu--list">
-          <a href="#" className="item active">
-            <BiHome className="icon" />
-            Check In
-          </a>
-          <a href="#" className="item">
-            <BiTask className="icon" />
-            Task
-          </a>
-          <a href="#" className="item">
-            <BiSolidReport className="icon" />
-            Report
-          </a>
-          <a href="#" className="item">
-            <BiStats className="icon" />
-            Stats
-          </a>
-          <a href="#" className="item">
-            <BiMessage className="icon" />
-            Message
-          </a>
-          <a href="#" className="item">
-            <BiHelpCircle className="icon" />
-            Help
-          </a>
-        </div>
-      </div>
-  );
+    );
 };
+
 export default SideBar;

@@ -1,24 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProfileHeader from "./ProfileHeader";
 import "../Profile/Profile.css";
-import userImage from "../Assets/default-avatar.png";
-import { format } from "date-fns";
-
 import defaultUserImage from "../Assets/default-avatar.png"; // Đường dẫn đến ảnh mặc định
+import { format } from "date-fns";
+import axios from "../Axios";
 const Profile = ({ selectedRecord }) => {
-  console.log("Profile received selectedRecord:", selectedRecord);
+  // console.log("Profile received selectedRecord:", selectedRecord);
+
+  const [userImageUrl, setUserImageUrl] = useState(defaultUserImage);
+  useEffect(() => {
+    if (selectedRecord) {
+        axios.post('http://127.0.0.1:8000/get_avatar_url', { sr: selectedRecord.uid })
+            .then(response => {
+                if (response.data && response.data.avatar_url) {
+                    setUserImageUrl(`data:image/png;base64,${response.data.avatar_url}`);
+                } else {
+                    console.error("Avatar URL not found in response data");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching user avatar:", error);
+            });
+    }
+}, [selectedRecord]);
 
   return (
     <div className="profile">
       <ProfileHeader />
       <div className="user--profile">
         <div className="user--detail">
-          <img
-            // src={selectedRecord && selectedRecord.avatar ? selectedRecord.avatar : defaultUserImage}
-            // alt="User Avatar"
-            src={userImage}
-            alt=""
-          />
+          {/* Hiển thị ảnh người dùng */}
+          <img src={userImageUrl} alt="User Avatar" />
+
           <h3 className="username">
             {selectedRecord ? selectedRecord.name : "No user selected"}
           </h3>

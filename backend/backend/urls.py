@@ -25,5 +25,11 @@ urlpatterns = [
     path('user', views.user_list_view, name='user'),
     path('user/search', views.user_search_view, name='user/search'),
     path('user/delete', views.user_delete_view, name='user/delete'),
+    path('get_cids', views.get_cid_view, name='get_cids'),
+    path('get_classes/', views.get_classes_view, name='get_classes'),
+    path('save_user', views.save_user_view, name='save_user'),
+    path('save_account', views.save_account_view, name='save_account'),
+    path('get_avatar_url', views.get_avatar_url_view, name='get_avatar_url'),
+
 
 ]

@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BiNotification, BiSearch } from "react-icons/bi";
 import ContentHeader from "../Content/ContentHeader";
 import DataTable from "react-data-table-component";
 import "../StudentList/StudentList.css";
 import Profile from "../Profile/Profile";
 import "../Profile/Profile.css";
 import { format } from "date-fns";
-import AxiosInstance from "../Axios";
 
 const StudentList = () => {
   const [records, setRecords] = useState([]);
