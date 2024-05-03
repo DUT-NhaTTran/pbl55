@@ -6,10 +6,9 @@ import LoginForm from "./Components/LoginForm/LoginForm";
 import SideBar from "./Components/SideBar/SideBar";
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LibManagement from "./Components/LibManagement/LibManagement";
 import Create from "./Components/Create/Create";
 import Account from "./Components/Create/Account";
-
+import BookList from "./Components/BookList/BookList";
 function App() {
   return (
     <BrowserRouter>
@@ -21,7 +20,8 @@ function App() {
           <Route path="content" element={<Content />} />
           <Route path="create" element={<Create />} />
           <Route path="account" element={<Account />} />
-        </Route>
+          <Route path="booklist" element={<BookList/>}/>
+        </Route> 
       </Routes>
     </BrowserRouter>
   );

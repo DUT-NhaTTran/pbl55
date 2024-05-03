@@ -184,6 +184,7 @@ def get_cid_view(request):
             return JsonResponse({'error': 'Error executing query'}, status=500)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
 def get_cid_view(request):
     if request.method == 'GET':
         try:
@@ -350,4 +351,74 @@ def get_avatar_url_view(request):
             print(f"Error fetching avatar URL: {e}")
             return JsonResponse({'error': 'Error fetching avatar URL'}, status=500)
     
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+
+def get_catagories_view(request):
+    if request.method == 'GET':
+        try:
+            sql = "SELECT distinct tag FROM Books"
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+
+                tag_list = [{'value': row[0], 'text': f'{row[0]}'} for row in data]
+
+
+            return JsonResponse({'tags': tag_list}, safe=False)
+
+        except Exception as e:
+            print("Error executing query:", e)
+            return JsonResponse({'error': 'Error executing query'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+
+def get_books_info(request):
+    if request.method == 'GET':
+        try:
+            sql = """
+                SELECT 
+                    Books.id,
+                    Books.book_name,
+                    Books.quantity,
+                    Books.auth,
+                    Books.tag,
+                    Books.description,
+                    BookImages.book_image  
+                FROM Books
+                JOIN BookImages ON Books.id = BookImages.bid  
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+
+            books_info = []
+            for row in data:
+                book_dict = {
+                    'id': row[0],
+                    'book_name': row[1],
+                    'quantity': row[2],
+                    'auth': row[3],
+                    'tag': row[4],
+                    'description': row[5],
+                }
+
+                # Lấy dữ liệu hình ảnh
+                binary_image = row[6]
+                if binary_image and len(binary_image) > 0:
+                    base64_image = base64.b64encode(binary_image).decode('utf-8')
+                    book_dict['book_image'] = base64_image
+                else:
+                    book_dict['book_image'] = None
+
+                books_info.append(book_dict)
+            
+            return JsonResponse({'books_info': books_info}, safe=False)
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return JsonResponse({'error': 'Error executing query'}, status=500)
     return JsonResponse({'error': 'Method not allowed'}, status=405)

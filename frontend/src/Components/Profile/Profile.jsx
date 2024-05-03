@@ -3,7 +3,7 @@ import ProfileHeader from "./ProfileHeader";
 import "../Profile/Profile.css";
 import defaultUserImage from "../Assets/default-avatar.png"; // Đường dẫn đến ảnh mặc định
 import { format } from "date-fns";
-import axios from "../Axios";
+import axios from "axios";
 const Profile = ({ selectedRecord }) => {
   // console.log("Profile received selectedRecord:", selectedRecord);
 

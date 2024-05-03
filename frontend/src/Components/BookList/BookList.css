@@ -1,0 +1,82 @@
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    margin-left: 5rem;
+    max-width: 100%; 
+    justify-content: center;/*phan chinh card can giua*/
+    /* gap:20px; */
+}
+.booklist-page {
+    display: block; 
+}
+
+.card {
+    margin: 30px;
+    padding: 20px;
+    cursor: pointer;
+    flex: 0 0 300px; 
+    transition: transform 0.2s; 
+    border-radius: 10px; 
+    background-color: #f8f9fa; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng */
+    transition: transform 0.2s, box-shadow 0.2s; /* Hiệu ứng chuyển động */
+}
+
+.card-img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+    object-fit: cover;  
+}
+
+.card-reviews{
+    margin-bottom:1rem;
+    display:flex;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color:black;
+}
+
+.card-details {
+    padding: 5px; 
+    display: flex;
+    flex-direction: column;
+}
+
+.book-title {
+    margin-bottom: 10px; 
+    font-size: 18px;
+    font-weight: bold; 
+    text-align: center; /* Căn giữa nội dung trong `card` */
+
+}
+
+.book-author {
+    margin-bottom: 5px; 
+}
+
+.author-label {
+    font-weight: bold; 
+    margin-right: 5px; 
+}
+
+.author-name {
+    color: #555; 
+}
+
+.book-quantity {
+    margin-bottom: 5px; 
+}
+
+.quantity-label {
+    font-weight: bold; 
+}
+
+.quantity-value {
+    color: #666; 
+}

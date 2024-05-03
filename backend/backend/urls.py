@@ -30,6 +30,7 @@ urlpatterns = [
     path('save_user', views.save_user_view, name='save_user'),
     path('save_account', views.save_account_view, name='save_account'),
     path('get_avatar_url', views.get_avatar_url_view, name='get_avatar_url'),
-
+    path('get_tags',views.get_catagories_view,name='get_tags'),
+    path('get_books_info', views.get_books_info, name='get_books_info'), 
 
 ]

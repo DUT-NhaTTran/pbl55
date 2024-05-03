@@ -27,7 +27,7 @@ const SideBar = () => {
                     <BiTask className="icon" />
                     Create
                 </Link>
-                <Link to="/home/account" className="item">
+                <Link to="/home/booklist" className="item">
                     <BiSolidReport className="icon" />
                     Books Collection
                 </Link>

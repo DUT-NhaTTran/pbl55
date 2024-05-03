@@ -1,0 +1,25 @@
+/* CSS cho phần Tags */
+.tags-flex {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép các nút xuống dòng khi cần */
+    margin-left: 2rem;
+}
+
+.tags-title {
+    margin-left: 2rem;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    font-size: 30px;
+}
+
+.btns {
+    width: 120px; /* Độ rộng cố định cho các nút */
+    padding: 15px;
+    margin-right: 6px;
+    background: transparent;
+    border: 0.6px solid #ccc;
+    border-radius: 5px;
+    color: #323232;
+    cursor: pointer;
+    font-size: 10px;
+}
