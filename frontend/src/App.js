@@ -1,5 +1,6 @@
 import Content from "./Components/Content/Content";
 import { Outlet } from "react-router-dom";
+import ReactModal from "react-modal";
 
 import "./App.css";
 import LoginForm from "./Components/LoginForm/LoginForm";
@@ -9,6 +10,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Create from "./Components/Create/Create";
 import Account from "./Components/Create/Account";
 import BookList from "./Components/BookList/BookList";
+import EditProfile from "./Components/EditProfile/EditProfile";
+ReactModal.setAppElement('#root');
+
 function App() {
   return (
     <BrowserRouter>
@@ -21,6 +25,8 @@ function App() {
           <Route path="create" element={<Create />} />
           <Route path="account" element={<Account />} />
           <Route path="booklist" element={<BookList/>}/>
+          <Route path="editprofile" element={<EditProfile/>}/>
+
         </Route> 
       </Routes>
     </BrowserRouter>

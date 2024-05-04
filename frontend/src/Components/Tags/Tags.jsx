@@ -1,40 +1,39 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Import axios
+import axios from "axios";
 import "../Tags/Tags.css";
 
-export default function Tags() {
-    const [categories, setCategories] = useState([]); 
+export default function Tags({ onTagSelect }) {
+  const [categories, setCategories] = useState([]);
 
-    useEffect(() => {
+  useEffect(() => {
     async function fetchData() {
-        try {
-            const response = await axios.get('http://127.0.0.1:8000/get_tags');
-            const data = response.data;
-            
-            // Kiểm tra dữ liệu trả về và cập nhật state
-            if (data && Array.isArray(data.tags)) {
-                setCategories(data.tags);
-            } else {
-                console.error("Unexpected response format:", data);
-            }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        }
+      try {
+        const response = await axios.get("http://127.0.0.1:8000/get_tags");
+        setCategories(response.data.tags);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
     }
 
     fetchData();
-}, []);
+  }, []);
 
-return (
-  <div>
+  return (
+    <div>
       <h2 className="tags-title">Tags</h2>
       <div className="tags-flex">
-          {categories.map((category, index) => (
-              <button key={index} className="btns">
-                  {category.text} {/* Hiển thị giá trị text của category */}
-              </button>
-          ))}
+      <button className="btns" onClick={() => onTagSelect("all")}>All tags</button>
+
+        {categories.map((tag, index) => (
+          <button
+            key={index}
+            className="btns"
+            onClick={() => onTagSelect(tag.text)}
+          >
+            {tag.text}
+          </button>
+        ))}
       </div>
-  </div>
-);
+    </div>
+  );
 }

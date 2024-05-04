@@ -251,13 +251,17 @@ def save_user_view(request):
             birth_date = request.POST.get('birthDate')
             gender = request.POST.get('gender')
             cid = request.POST.get('cid')
-            avatar_file = request.FILES.get('avatar')  # Đọc file ảnh từ request.FILES
+            avatar_file = request.FILES.get('avatar')
 
-            if gender == 'male':
-                gender = 1  # Nam
-            elif gender == 'female':
-                gender = 0  # Nữ
+            logger.debug(f"Received data: uid={uid}, name={name}, email={email}, id={user_id}, birthDate={birth_date}, gender={gender}, cid={cid}")
+
+            # Chuyển đổi giá trị giới tính thành số
+            if gender == 'male' or gender == '1':
+                gender = 1
+            elif gender == 'female' or gender == '0':
+                gender = 0
             else:
+                logger.warning(f"Invalid gender value: {gender}")
                 return JsonResponse({'error': 'Invalid gender value'}, status=400)
 
             insert_user_sql = """
@@ -270,14 +274,12 @@ def save_user_view(request):
             """
 
             with connections['default'].cursor() as cursor:
+                # Thực hiện truy vấn để lưu người dùng
                 cursor.execute(insert_user_sql, (uid, name, email, user_id, birth_date, gender, cid, 0))
 
-                # Nếu có file ảnh, chèn dữ liệu vào bảng Avatars
+                # Nếu có avatar, lưu vào bảng Avatars
                 if avatar_file:
-                    # Đọc dữ liệu ảnh
                     avatar_data = avatar_file.read()
-
-                    # Thực hiện truy vấn
                     cursor.execute(insert_avatar_sql, (uid, avatar_data))
 
             return JsonResponse({'message': 'User and avatar saved successfully'})
@@ -289,8 +291,6 @@ def save_user_view(request):
 
     # Trả về lỗi nếu phương thức không phải là POST
     return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-
 @csrf_exempt
 def save_account_view(request):
     if request.method == 'POST':
@@ -421,4 +421,180 @@ def get_books_info(request):
         except Exception as e:
             print(f"Error executing query: {e}")
             return JsonResponse({'error': 'Error executing query'}, status=500)
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def books_by_tag(request):
+    if request.method == 'GET':
+        tag = request.GET.get('tag')
+
+        if not tag:
+            return JsonResponse({'error': 'Tag not provided'}, status=400)
+
+        try:
+            # Truy vấn SQL để lấy sách theo tag
+            sql = """
+                SELECT
+                    Books.id,
+                    Books.book_name,
+                    Books.quantity,
+                    Books.auth,
+                    Books.tag,
+                    Books.description,
+                    BookImages.book_image
+                FROM
+                    Books
+                JOIN
+                    BookImages ON Books.id = BookImages.bid
+                WHERE
+                    Books.tag = %s
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql, [tag])
+                data = cursor.fetchall()
+
+            books_list = []
+            for row in data:
+                book_dict = {
+                    'id': row[0],
+                    'book_name': row[1],
+                    'quantity': row[2],
+                    'auth': row[3],
+                    'tag': row[4],
+                    'description': row[5],
+                }
+
+                binary_image = row[6]
+                if binary_image:
+                    base64_image = base64.b64encode(binary_image).decode('utf-8')
+                    book_dict['book_image'] = base64_image
+                else:
+                    book_dict['book_image'] = None
+
+                books_list.append(book_dict)
+            
+            return JsonResponse({'books_list': books_list}, safe=False)
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return JsonResponse({'error': 'Error executing query'}, status=500)
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def get_user_info(request):
+    if request.method == 'GET':
+        try:
+            uid = request.GET.get('uid')
+
+            # Kiểm tra uid có tồn tại không
+            if not uid:
+                return JsonResponse({'error': 'UID not provided'}, status=400)
+
+            get_user_sql = """
+                SELECT u.uid, u.name, u.email, u.id, u.birth, u.gender, u.cid, u.isAdmin, c.class_name, a.image
+                FROM Users u
+                LEFT JOIN Avatars a ON u.uid = a.uid
+                LEFT JOIN Classes c ON u.cid = c.cid
+                WHERE u.uid = %s
+            """
+
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(get_user_sql, [uid])
+                row = cursor.fetchone()  # Lấy một hàng dữ liệu từ truy vấn
+
+                # Kiểm tra hàng dữ liệu nhận được
+                if not row:
+                    logger.warning(f"User not found with UID: {uid}")
+                    return JsonResponse({'error': 'User not found'}, status=404)
+
+                # Phân tách dữ liệu từ hàng dữ liệu
+                uid, name, email, user_id, birth_date, gender, cid, is_admin,class_name, avatar_data= row
+
+               
+                # Nếu có dữ liệu ảnh, chuyển đổi nó sang Base64
+                avatar_base64 = None
+                if avatar_data:
+                    avatar_base64 = base64.b64encode(avatar_data).decode('utf-8')
+
+                user_info = {
+                    'uid': uid,
+                    'name': name,
+                    'email': email,
+                    'id': user_id,
+                    'birth': birth_date,
+                    'gender': gender,
+                    'cid': cid,
+                    'is_admin': is_admin,
+                    'avatar': avatar_base64,
+                    'class_name':class_name
+                }
+
+                # Trả về thông tin người dùng dưới dạng JSON
+                return JsonResponse(user_info)
+
+        except Exception as e:
+            # Ghi nhật ký lỗi
+            logger.error(f"Error fetching user info: {e}")
+            return JsonResponse({'error': 'Error fetching user info'}, status=500)
+
+    # Trả về lỗi nếu phương thức không phải là GET
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def edit_user_view(request):
+    if request.method == 'POST':
+        try:
+            uid = request.POST.get('uid')
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+            user_id = request.POST.get('id')
+            birth_date = request.POST.get('birthDate')
+            gender = request.POST.get('gender')
+            cid = request.POST.get('cid')
+            avatar_file = request.FILES.get('avatar')
+
+            logger.debug(f"Received data: uid={uid}, name={name}, email={email}, id={user_id}, birthDate={birth_date}, gender={gender}, cid={cid}")
+
+            # Chuyển đổi giá trị giới tính thành số
+            if gender == 'male' or gender == '1':
+                gender = 1
+            elif gender == 'female' or gender == '0':
+                gender = 0
+            else:
+                logger.warning(f"Invalid gender value: {gender}")
+                return JsonResponse({'error': 'Invalid gender value'}, status=400)
+
+            # Câu truy vấn SQL để cập nhật thông tin người dùng
+            update_user_sql = """
+                UPDATE Users
+                SET name = %s,
+                    email = %s,
+                    id = %s,
+                    birth = %s,
+                    gender = %s,
+                    cid = %s
+                WHERE uid = %s
+            """
+            update_avatar_sql = """
+                REPLACE INTO Avatars (uid, image)
+                VALUES (%s, %s)
+            """
+
+            with connections['default'].cursor() as cursor:
+                # Thực hiện truy vấn để cập nhật người dùng
+                cursor.execute(update_user_sql, (name, email, user_id, birth_date, gender, cid, uid))
+
+                # Nếu có avatar, cập nhật bảng Avatars
+                if avatar_file:
+                    avatar_data = avatar_file.read()
+                    cursor.execute(update_avatar_sql, (uid, avatar_data))
+
+            return JsonResponse({'message': 'User and avatar updated successfully'})
+
+        except Exception as e:
+            # Ghi nhật ký lỗi
+            logger.error(f"Error updating user data: {e}")
+            return JsonResponse({'error': 'Error updating user data'}, status=500)
+
+    # Trả về lỗi nếu phương thức không phải là POST
     return JsonResponse({'error': 'Method not allowed'}, status=405)

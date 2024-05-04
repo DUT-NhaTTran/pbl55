@@ -26,7 +26,9 @@ const Profile = ({ selectedRecord }) => {
 
   return (
     <div className="profile">
-      <ProfileHeader />
+      {/* <ProfileHeader /> */}
+      <ProfileHeader selectedRecord={selectedRecord} />
+
       <div className="user--profile">
         <div className="user--detail">
           {/* Hiển thị ảnh người dùng */}

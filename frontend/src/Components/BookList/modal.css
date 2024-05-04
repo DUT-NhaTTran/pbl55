@@ -1,0 +1,59 @@
+/* Định dạng lớp phủ (overlay) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+.modal-content {
+    display: flex; 
+    gap: 20px; 
+    background-color: white;
+    padding: 100px;
+    border-radius: 8px;
+    max-width: 800px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal-image {
+    max-width: 100%; 
+    height: auto; 
+    object-fit: contain; 
+  }
+  
+  .modal-info {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column; 
+    justify-content: space-between; 
+  }
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end; /* Căn phải */
+    margin-top: 20px;
+    padding-right: 20px; /* Điều chỉnh khoảng cách từ bên phải */
+  }
+  
+  /* Định dạng cho nút đóng */
+  .close-button {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-items: flex-end;
+  }
+  
+  .close-button:hover {
+    background-color: #0056b3;
+  }

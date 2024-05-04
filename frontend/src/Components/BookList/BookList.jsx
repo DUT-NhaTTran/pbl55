@@ -1,63 +1,140 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Nhập axios
-import Tags from "../Tags/Tags";
+import axios from "axios";
+import Tags from "../Tags/Tags"; // Thành phần Tags
 import "../BookList/BookList.css";
-import { AiFillStar } from "react-icons/ai";
-import { BsFillBagHeartFill } from "react-icons/bs";
+import "../BookList/modal.css"; // Nhập file CSS
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import ReactModal from "react-modal";
 
 export default function BookList() {
   const [books, setBooks] = useState([]);
-  const [BookImagePreviewUrl, setBookImagePreviewUrl] = useState(""); // URL của ảnh đã chọn
+  const [selectedBook, setSelectedBook] = useState(null); // Sách được chọn
+  const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái Modal
 
-  useEffect(() => {
-    // Gọi API để lấy danh sách sách
-    async function fetchBooks() {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/get_books_info"
-        );
+  // Hàm để lấy sách theo tag hoặc tất cả sách
+  const fetchBooksByTag = async (tag) => {
+    try {
+      let response;
+      if (tag === "" || tag === "all") {
+        // Lấy tất cả sách
+        response = await axios.get("http://127.0.0.1:8000/get_books_info");
         setBooks(response.data.books_info);
-      } catch (error) {
-        console.error("Error fetching books:", error);
+      } else {
+        // Lấy sách theo tag cụ thể
+        response = await axios.get(
+          `http://127.0.0.1:8000/books_by_tag?tag=${tag}`
+        );
+        setBooks(response.data.books_list);
       }
+    } catch (error) {
+      console.error("Error fetching books:", error);
     }
+  };
 
-    fetchBooks();
+  // Khi thành phần được render lần đầu, gọi API để lấy tất cả sách
+  useEffect(() => {
+    fetchBooksByTag("");
   }, []);
+
+  // Hàm để mở modal và hiển thị thông tin chi tiết sách
+  const handleBookClick = (book) => {
+    console.log("Đã bấm vào sách:", book);
+
+    console.log("Sách được chọn:", book);
+    setSelectedBook(book);
+    setIsModalOpen(true);
+    console.log("Trạng thái modal:", isModalOpen);
+  };
+
+  // Hàm để đóng modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBook(null);
+  };
 
   return (
     <div className="booklist-page">
-        <Tags />
-        <section className="card-container">
-            {books.map((book, index) => (
-                <section key={index} className="card">
-                    {/* Hiển thị ảnh bìa sách */}
-                    <img src={`data:image/png;base64,${book.book_image}`} className="card-img" alt="book cover" />
+      {/* Truyền hàm handleTagSelection cho thành phần Tags */}
+      <Tags onTagSelect={fetchBooksByTag} />
+      <section className="card-container">
+        {books.map((book, index) => (
+          <section
+            key={index}
+            className="card"
+            onClick={() => handleBookClick(book)} // Khi bấm vào sách, mở modal
+          >
+            <img
+              src={`data:image/png;base64,${book.book_image}`}
+              className="card-img"
+              alt="book cover"
+            />
+            <div className="card-details">
+              <div className="book-title">
+                <h3>{book.book_name}</h3>
+              </div>
+              <div className="book-author">
+                <span className="author-label">Tác giả:</span>
+                <span className="author-name">{book.auth}</span>
+              </div>
+              <div className="book-quantity">
+                <span className="quantity-label">Số lượng:</span>
+                <span className="quantity-value">{book.quantity}</span>
+              </div>
+            </div>
+          </section>
+        ))}
+      </section>
 
-                    {/* Hiển thị chi tiết sách */}
-                    <div className="card-details">
-                        {/* Hiển thị tiêu đề sách */}
-                        <div className="book-title">
-                            <h3>{book.book_name}</h3>
-                        </div>
-
-                        {/* Hiển thị thông tin về tác giả */}
-                        <div className="book-author">
-                            <span className="author-label">Tác giả:</span> {/* Tiêu đề "Tác giả" */}
-                            <span className="author-name">{book.auth}</span> {/* Tên tác giả */}
-                        </div>
-                        
-                        {/* Hiển thị thông tin về số lượng sách */}
-                        <div className="book-quantity">
-                            <span className="quantity-label">Số lượng:</span> {/* Tiêu đề "Số lượng" */}
-                            <span className="quantity-value">{book.quantity}</span> {/* Giá trị số lượng */}
-                        </div>
-
-                        {/* Bạn có thể thêm các thông tin khác ở đây */}
-                    </div>
-                </section>
-            ))}
-        </section>
+      <ReactModal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Chi tiết sách"
+        className="modal-content"
+        overlayClassName="modal-overlay"
+      >
+        {selectedBook && (
+          <div className="row">
+            <div className="col-md-6">
+              <img
+                src={`data:image/png;base64,${selectedBook.book_image}`}
+                alt="book cover"
+                className="modal-image"
+              />
+            </div>
+            <div className="col-md-6">
+              <div className="book-title">
+                <h3>{selectedBook.book_name}</h3>
+              </div>
+              <div className="book-author">
+                <span className="author-label">Tác giả: </span>
+                <span className="author-name">{selectedBook.auth}</span>
+              </div>
+              <div className="book-quantity">
+                <span className="quantity-label">Số lượng: </span>
+                <span className="quantity-value">{selectedBook.quantity}</span>
+              </div>
+              <div className="book-quantity">
+                <span className="author-label">Mã sách: </span>
+                <span className="author-value">{selectedBook.id}</span>
+              </div>
+              <div className="book-quantity">
+                <span className="author-label">Tag: </span>
+                <span className="author-value">{selectedBook.tag}</span>
+              </div>
+              <div className="book-quantity">
+                <span className="author-label">Mô tả: </span>
+                <span className="author-value">{selectedBook.description}</span>
+              </div>
+              <div className="modal-footer">
+                <button className="close-button" onClick={closeModal}>
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </ReactModal>
     </div>
-);
+  );
 }
