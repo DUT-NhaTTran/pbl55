@@ -4,6 +4,7 @@ import Tags from "../Tags/Tags"; // Thành phần Tags
 import "../BookList/BookList.css";
 import "../BookList/modal.css"; // Nhập file CSS
 import "bootstrap/dist/css/bootstrap.min.css";
+import { BiSearch } from "react-icons/bi";
 
 import ReactModal from "react-modal";
 
@@ -11,7 +12,8 @@ export default function BookList() {
   const [books, setBooks] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null); // Sách được chọn
   const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái Modal
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [SortOption, setSortOption] = useState("");
   // Hàm để lấy sách theo tag hoặc tất cả sách
   const fetchBooksByTag = async (tag) => {
     try {
@@ -36,7 +38,52 @@ export default function BookList() {
   useEffect(() => {
     fetchBooksByTag("");
   }, []);
-
+  const handleSearchChange = async (event) => {
+    const query = event.target.value;
+  
+    setSearchQuery(query);
+  
+    if (query.trim() !== "") {
+      try {
+        const lowerCaseQuery = query.toLowerCase();
+        const response = await axios.get(`http://127.0.0.1:8000/search_books?query=${lowerCaseQuery}`);
+  
+        setBooks(response.data.books);
+      } catch (error) {
+        console.error("Error fetching books based on search query:", error);
+      }
+    } else {
+      fetchAllBooks();
+    }
+  };
+  const handleSortChange = async (event) => {
+    const sortOption = event.target.value;
+  
+    setSortOption(sortOption);
+  
+    if (sortOption !== "") {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/sort_books?sortOption=${sortOption}`);
+  
+        setBooks(response.data.books);
+      } catch (error) {
+        console.error("Error sorting books:", error);
+      }
+    } else {
+      fetchAllBooks();
+    }
+  };
+  
+  const fetchAllBooks = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/get_books_info");
+  
+      setBooks(response.data.books_info);
+    } catch (error) {
+      console.error("Error fetching all books:", error);
+    }
+  };
+  
   // Hàm để mở modal và hiển thị thông tin chi tiết sách
   const handleBookClick = (book) => {
     console.log("Đã bấm vào sách:", book);
@@ -52,11 +99,36 @@ export default function BookList() {
     setIsModalOpen(false);
     setSelectedBook(null);
   };
-
+  
   return (
     <div className="booklist-page">
       {/* Truyền hàm handleTagSelection cho thành phần Tags */}
       <Tags onTagSelect={fetchBooksByTag} />
+      <div className="search-sort-container row">
+        <div className="search-box col-md-6">
+          <input
+            type="text"
+            placeholder="Tìm kiếm sách ..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          <BiSearch className="search-icon" />
+        </div>
+        <div className="sort-column col-md-6">
+          <select
+            className="sort-dropdown"
+            value={SortOption}
+            onChange={handleSortChange}
+          >
+            <option value="">Sắp xếp</option>
+            <option value="name-asc">Tên (A-Z)</option>
+            <option value="name-desc">Tên (Z-A)</option>
+            <option value="quantity-asc">Số lượng (Tăng dần)</option>
+            <option value="quantity-desc">Số lượng (Giảm dần)</option>
+          </select>
+        </div>
+      </div>
       <section className="card-container">
         {books.map((book, index) => (
           <section

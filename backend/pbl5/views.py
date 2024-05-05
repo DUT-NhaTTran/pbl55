@@ -598,3 +598,119 @@ def edit_user_view(request):
 
     # Trả về lỗi nếu phương thức không phải là POST
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def search_books(request):
+    query = request.GET.get('query', '')
+
+    if query:
+        # Truy vấn SQL để tìm sách và hình ảnh sách dựa trên book_name hoặc auth chứa query
+        sql_query = """
+        SELECT
+            Books.id,
+            Books.book_name,
+            Books.quantity,
+            Books.auth,
+            Books.tag,
+            Books.description,
+            BookImages.book_image
+        FROM
+            Books
+        JOIN
+            BookImages ON Books.id = BookImages.bid
+        WHERE
+            Books.book_name LIKE %s OR Books.auth LIKE %s;
+        """
+
+        # Mở kết nối và thực hiện truy vấn
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, (f"%{query}%", f"%{query}%"))
+            
+            # Lấy tất cả kết quả
+            books = cursor.fetchall()
+
+            # Chuyển đổi kết quả thành danh sách từ điển
+            books_list = []
+            for row in books:
+                book_dict = {
+                    'id': row[0],
+                    'book_name': row[1],
+                    'quantity': row[2],
+                    'auth': row[3],
+                    'tag': row[4],
+                    'description': row[5],
+                }
+
+                binary_image = row[6]
+                if binary_image:
+                    # Mã hóa hình ảnh thành chuỗi base64
+                    base64_image = base64.b64encode(binary_image).decode('utf-8')
+                    book_dict['book_image'] = base64_image
+                else:
+                    book_dict['book_image'] = None
+
+                books_list.append(book_dict)
+
+        # Trả về danh sách sách dưới dạng JSON
+        return JsonResponse({'books': books_list})
+
+    # Nếu query trống, trả về danh sách rỗng
+    return JsonResponse({'books': []})
+@csrf_exempt
+def sort_books(request):
+    sortOption = request.GET.get('sortOption', '')
+
+    if sortOption == 'name-asc':
+        order_by = 'book_name ASC'
+    elif sortOption == 'name-desc':
+        order_by = 'book_name DESC'
+    elif sortOption == 'quantity-asc':
+        order_by = 'quantity ASC'
+    elif sortOption == 'quantity-desc':
+        order_by = 'quantity DESC'
+    else:
+        return JsonResponse({'books': []})
+
+    # Truy vấn SQL để lấy sách và sắp xếp theo tiêu chí
+    sql_query = f"""
+    SELECT
+        Books.id,
+        Books.book_name,
+        Books.auth,
+        Books.quantity,
+        Books.description,
+        Books.tag,
+        BookImages.book_image
+    FROM
+        Books
+    JOIN
+        BookImages ON Books.id = BookImages.bid
+    ORDER BY
+        {order_by};
+    """
+
+    with connections['default'].cursor() as cursor:
+        cursor.execute(sql_query)
+        
+        books = cursor.fetchall()
+        books_list = []
+        for row in books:
+            book_dict = {
+                'id': row[0],
+                'book_name': row[1],
+                'auth': row[2],
+                'quantity': row[3],
+                'description': row[4],
+                'tag': row[5],
+            }
+
+            binary_image = row[6]
+            if binary_image:
+                base64_image = base64.b64encode(binary_image).decode('utf-8')
+                book_dict['book_image'] = base64_image
+            else:
+                book_dict['book_image'] = None
+
+            books_list.append(book_dict)
+
+    # Trả về danh sách sách đã sắp xếp dưới dạng JSON
+    return JsonResponse({'books': books_list})

@@ -35,6 +35,10 @@ urlpatterns = [
     path('books_by_tag', views.books_by_tag, name='books_by_tag'),
     path('get_user_info', views.get_user_info, name='get_user_info'),
     path('edit_user_view', views.edit_user_view, name='edit_user_view'),
+    path('search_books', views.search_books, name='search_books'),
+    path('sort_books', views.sort_books, name='sort_books'),
+
+
 
 
 

@@ -82,3 +82,57 @@
 .quantity-value {
     color: #666; 
 }
+.control-bar {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+.search-box{
+    background: #dde6dd;
+    padding: 8px 80px;
+    border-radius: 10px;
+    display:flex;
+    align-items: center;
+    margin-top:20px;
+    margin-left:30px;
+    
+    
+}
+.search-box input{
+    border:none;
+    outline:none;
+    background:transparent;
+    padding:5px;
+    outline:none;
+}
+.search-box .icon{
+    color:#969393;
+   font-size:22px;
+   cursor:pointer;
+}
+.sort-dropdown {
+    padding: 8px 12px; /* Thêm khoảng đệm xung quanh văn bản */
+    border-radius: 5px; /* Bo tròn các góc */
+    border: 1px solid #ccc; /* Đường viền màu xám nhạt */
+    background-color: #f8f8f8; /* Màu nền nhạt */
+    color: #333; /* Màu văn bản */
+    font-size: 14px; /* Kích thước phông chữ */
+    outline: none; /* Loại bỏ đường viền xung quanh khi tập trung */
+    cursor: pointer; /* Con trỏ dạng tay khi di chuột lên */
+    transition: all 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
+    margin-top:20px;
+    margin-left:30px;
+    justify-content: flex-end; /* Đặt dropdown list sang phải */
+
+  }
+  
+  .sort-dropdown:focus {
+    border-color: #007bff; /* Đường viền màu xanh lam khi tập trung */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Bóng đổ nhẹ */
+  }
+  .search-box-container {
+    display: flex; /* Đặt flexbox để tạo hai cột */
+    margin-bottom: 20px; /* Khoảng cách dưới để tách khỏi phần khác */
+    
+  }
+  

@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../Create/Create.css";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const Create = () => {
   // Quản lý các trạng thái để lưu trữ dữ liệu đầu vào từ biểu mẫu
@@ -19,7 +19,18 @@ const Create = () => {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(""); // URL của ảnh đã chọn
   const navigate = useNavigate();
-        
+  const handleReset = () => {
+    setUid("");
+    setName("");
+    setEmail("");
+    setId("");
+    setBirthDate("");
+    setGender("");
+    setSelectedCid("");
+    setSelectedClass("");
+    setAvatarFile(null);
+    setAvatarPreviewUrl(""); // Đặt lại URL của ảnh đã chọn
+};
   // Xử lý khi người dùng chọn file ảnh
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -90,8 +101,7 @@ const Create = () => {
       .post("http://127.0.0.1:8000/save_user", formData)
       .then((response) => {
         console.log("User saved successfully:", response.data);
-        navigate("/home/account"); 
-
+        navigate("/home/account");
       })
       .catch((error) => {
         console.error("Error saving user data:", error);
@@ -120,7 +130,11 @@ const Create = () => {
                 onChange={handleFileChange}
               />
             </label>
-            <button type="button" className="reset-button">
+            <button
+              type="button"
+              className="reset-button"
+              onClick={handleReset}
+            >
               Reset
             </button>
           </div>
