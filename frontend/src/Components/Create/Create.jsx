@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 const Create = () => {
   // Quản lý các trạng thái để lưu trữ dữ liệu đầu vào từ biểu mẫu
-  const [cidList, setCidList] = useState([]);
-  const [selectedCid, setSelectedCid] = useState("");
+  const [fidList, setFidList] = useState([]);
+  const [selectedFid, setSelectedFid] = useState("");
   const [classList, setClassList] = useState([]);
   const [uid, setUid] = useState("");
   const [name, setName] = useState("");
@@ -26,7 +26,7 @@ const Create = () => {
     setId("");
     setBirthDate("");
     setGender("");
-    setSelectedCid("");
+    setSelectedFid("");
     setSelectedClass("");
     setAvatarFile(null);
     setAvatarPreviewUrl(""); // Đặt lại URL của ảnh đã chọn
@@ -49,24 +49,23 @@ const Create = () => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/get_cids")
+      .get("http://127.0.0.1:8000/get_fids")
       .then((response) => {
-        // Xử lý dữ liệu CID nhận được
-        if (response.data && Array.isArray(response.data.cids)) {
-          setCidList(response.data.cids);
+        if (response.data && Array.isArray(response.data.fids)) {
+          setFidList(response.data.fids);
         } else {
           console.error("Unexpected response format:", response.data);
         }
       })
       .catch((error) => {
-        console.error("Error fetching CID data:", error);
+        console.error("Error fetching FID data:", error);
       });
   }, []);
 
   useEffect(() => {
-    if (selectedCid) {
+    if (selectedFid) {
       axios
-        .post("http://127.0.0.1:8000/get_classes/", { cid: selectedCid })
+        .post("http://127.0.0.1:8000/get_classes/", { fid: selectedFid })
         .then((response) => {
           const classes = response.data.classes;
           setClassList(classes);
@@ -75,7 +74,7 @@ const Create = () => {
           console.error("Error fetching classes data:", error);
         });
     }
-  }, [selectedCid]);
+  }, [selectedFid]);
   const handleSave = (e) => {
     e.preventDefault(); // Ngăn chặn form submit mặc định
 
@@ -88,8 +87,8 @@ const Create = () => {
     formData.append("id", id);
     formData.append("birthDate", birthDate);
     formData.append("gender", gender);
-    formData.append("cid", selectedCid);
-    formData.append("className", selectedClass);
+    formData.append("fid", selectedFid);
+    formData.append("class_name", selectedClass);
 
     // Thêm avatarFile vào formData nếu nó tồn tại
     if (avatarFile) {
@@ -218,18 +217,18 @@ const Create = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label className="form-label">CID</label>
+                <label className="form-label">Falculty Name</label>
                 <select
                   className="form-input"
-                  value={selectedCid}
-                  onChange={(e) => setSelectedCid(e.target.value)}
+                  value={selectedFid}
+                  onChange={(e) => setSelectedFid(e.target.value)}
                 >
                   {/* Tùy chọn mặc định */}
-                  <option value="">Select class id</option>
-                  {/* Lặp qua danh sách CID để tạo các tùy chọn */}
-                  {cidList.map((cid) => (
-                    <option key={cid.value} value={cid.value}>
-                      {cid.text}
+                  <option value="">Select Faculty Name</option>
+                  {/* Lặp qua danh sách FID để tạo các tùy chọn */}
+                  {fidList.map((fid) => (
+                    <option key={fid.value} value={fid.value}>
+                      {fid.text}
                     </option>
                   ))}
                 </select>

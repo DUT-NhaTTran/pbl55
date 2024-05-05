@@ -3,9 +3,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../Create/Create.css";
 import axios from "axios";
 import Notification from "../Noti/Noti";
+import { useNavigate } from "react-router-dom";
 
 const Account = () => {
     const [username, setUsername] = useState("");
+    const navigate = useNavigate();
     const [password, setPassword] = useState("");
     const [reenterPassword, setReenterPassword] = useState("");
     const [notification, setNotification] = useState(null);
@@ -31,6 +33,8 @@ const Account = () => {
             .post("http://127.0.0.1:8000/save_account", data)
             .then((response) => {
                 console.log("Account saved successfully:", response.data);
+                navigate("/home/create");
+
             })
             .catch((error) => {
                 console.error("Error saving account data:", error);

@@ -165,19 +165,19 @@ def user_delete_view(request):
             return JsonResponse({'error': 'An error occurred while processing the request'}, status=500)
 
     return HttpResponseBadRequest("Method not allowed")
-def get_cid_view(request):
+def get_fid_view(request):
     if request.method == 'GET':
         try:
-            sql = "SELECT cid FROM Classes"
+            sql = "SELECT faculty_name FROM Faculties"
 
             with connections['default'].cursor() as cursor:
                 cursor.execute(sql)
                 data = cursor.fetchall()
 
-                cid_list = [{'value': row[0], 'text': f'{row[0]}'} for row in data]
+                fid_list = [{'value': row[0], 'text': f'{row[0]}'} for row in data]
 
 
-            return JsonResponse({'cids': cid_list}, safe=False)
+            return JsonResponse({'fids': fid_list}, safe=False)
 
         except Exception as e:
             print("Error executing query:", e)
@@ -211,19 +211,20 @@ def get_classes_view(request):
         try:
             # Nhận dữ liệu JSON từ body của yêu cầu
             data = json.loads(request.body)
-            selected_cid = data.get('cid')
+            selected_fid = data.get('fid')
 
-            if not selected_cid:
-                return JsonResponse({'error': 'CID is required'}, status=400)
+            if not selected_fid:
+                return JsonResponse({'error': 'FID is required'}, status=400)
 
             sql = """
-            SELECT class_name
+            SELECT Classes.class_name
             FROM Classes
-            WHERE cid = %s;
+            JOIN Faculties 
+            WHERE Faculties.fid = Classes.fid AND Faculties.faculty_name = %s;
             """
             
             with connections['default'].cursor() as cursor:
-                cursor.execute(sql, [selected_cid])
+                cursor.execute(sql, [selected_fid])
                 result = cursor.fetchall()
             
             class_list = [{'value': class_name, 'text': class_name} for (class_name,) in result]
@@ -250,10 +251,9 @@ def save_user_view(request):
             user_id = request.POST.get('id')
             birth_date = request.POST.get('birthDate')
             gender = request.POST.get('gender')
-            cid = request.POST.get('cid')
+            class_name = request.POST.get('class_name')
+            faculty_name = request.POST.get('fid')
             avatar_file = request.FILES.get('avatar')
-
-            logger.debug(f"Received data: uid={uid}, name={name}, email={email}, id={user_id}, birthDate={birth_date}, gender={gender}, cid={cid}")
 
             # Chuyển đổi giá trị giới tính thành số
             if gender == 'male' or gender == '1':
@@ -264,22 +264,38 @@ def save_user_view(request):
                 logger.warning(f"Invalid gender value: {gender}")
                 return JsonResponse({'error': 'Invalid gender value'}, status=400)
 
-            insert_user_sql = """
-                INSERT INTO Users (uid, name, email, id, birth, gender, cid, isAdmin)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            # Tìm `cid` dựa trên `class_name` và `faculty_name`
+            find_cid_sql = """
+                SELECT cid
+                FROM Classes
+                JOIN Faculties ON Classes.fid = Faculties.fid
+                WHERE Classes.class_name = %s AND Faculties.faculty_name = %s
             """
-            insert_avatar_sql = """
-                INSERT INTO Avatars (uid, image)
-                VALUES (%s, %s)
-            """
-
             with connections['default'].cursor() as cursor:
+                cursor.execute(find_cid_sql, (class_name, faculty_name))
+                result = cursor.fetchone()
+                
+                # Kiểm tra kết quả tìm `cid`
+                if not result:
+                    return JsonResponse({'error': 'Class not found for the provided class_name and faculty_name'}, status=400)
+                
+                # Lấy `cid` từ kết quả
+                cid = result[0]
+
                 # Thực hiện truy vấn để lưu người dùng
+                insert_user_sql = """
+                    INSERT INTO Users (uid, name, email, id, birth, gender, cid, isAdmin)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """
                 cursor.execute(insert_user_sql, (uid, name, email, user_id, birth_date, gender, cid, 0))
 
-                # Nếu có avatar, lưu vào bảng Avatars
+                # Nếu có avatar, lưu vào bảng `Avatars`
                 if avatar_file:
                     avatar_data = avatar_file.read()
+                    insert_avatar_sql = """
+                        INSERT INTO Avatars (uid, image)
+                        VALUES (%s, %s)
+                    """
                     cursor.execute(insert_avatar_sql, (uid, avatar_data))
 
             return JsonResponse({'message': 'User and avatar saved successfully'})
@@ -291,6 +307,7 @@ def save_user_view(request):
 
     # Trả về lỗi nếu phương thức không phải là POST
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 @csrf_exempt
 def save_account_view(request):
     if request.method == 'POST':
@@ -491,10 +508,11 @@ def get_user_info(request):
                 return JsonResponse({'error': 'UID not provided'}, status=400)
 
             get_user_sql = """
-                SELECT u.uid, u.name, u.email, u.id, u.birth, u.gender, u.cid, u.isAdmin, c.class_name, a.image
+                SELECT u.uid, u.name, u.email, u.id, u.birth, u.gender, f.faculty_name, u.isAdmin, c.class_name, a.image
                 FROM Users u
                 LEFT JOIN Avatars a ON u.uid = a.uid
                 LEFT JOIN Classes c ON u.cid = c.cid
+                LEFT JOIN Faculties f ON c.fid = f.fid
                 WHERE u.uid = %s
             """
 
@@ -509,9 +527,8 @@ def get_user_info(request):
                     return JsonResponse({'error': 'User not found'}, status=404)
 
                 # Phân tách dữ liệu từ hàng dữ liệu
-                uid, name, email, user_id, birth_date, gender, cid, is_admin,class_name, avatar_data= row
+                uid, name, email, user_id, birth_date, gender, fid, is_admin,class_name, avatar_data= row
 
-               
                 # Nếu có dữ liệu ảnh, chuyển đổi nó sang Base64
                 avatar_base64 = None
                 if avatar_data:
@@ -524,14 +541,15 @@ def get_user_info(request):
                     'id': user_id,
                     'birth': birth_date,
                     'gender': gender,
-                    'cid': cid,
+                    'fid': fid,
                     'is_admin': is_admin,
+                    'class_name':class_name,
                     'avatar': avatar_base64,
-                    'class_name':class_name
                 }
 
                 # Trả về thông tin người dùng dưới dạng JSON
                 return JsonResponse(user_info)
+
 
         except Exception as e:
             # Ghi nhật ký lỗi
@@ -542,29 +560,48 @@ def get_user_info(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 @csrf_exempt
 def edit_user_view(request):
+    print('edit nè')
     if request.method == 'POST':
         try:
+           
             uid = request.POST.get('uid')
+            print('uid nè ',uid)
             name = request.POST.get('name')
             email = request.POST.get('email')
             user_id = request.POST.get('id')
-            birth_date = request.POST.get('birthDate')
+            birth_date = request.POST.get('birth')
             gender = request.POST.get('gender')
-            cid = request.POST.get('cid')
+            class_name = request.POST.get('class_name')
+            faculty_name = request.POST.get('fid')
             avatar_file = request.FILES.get('avatar')
+            print('class name nè',class_name)
+            print('faculty_name',faculty_name)
+            
+            # Kiểm tra uid có tồn tại không
+            if not uid:
+                return JsonResponse({'error': 'UID not provided'}, status=400)
 
-            logger.debug(f"Received data: uid={uid}, name={name}, email={email}, id={user_id}, birthDate={birth_date}, gender={gender}, cid={cid}")
+            # Tìm `cid` dựa trên `class_name` và `faculty_name`
+            find_cid_sql = """
+                SELECT cid
+                FROM Classes
+                JOIN Faculties ON Classes.fid = Faculties.fid
+                WHERE Classes.class_name = %s AND Faculties.faculty_name = %s
+            """
+            
+            with connections['default'].cursor() as cursor:
+                cursor.execute(find_cid_sql, [class_name, faculty_name])
+                result = cursor.fetchone()
+                
+                # Kiểm tra kết quả tìm `cid`
+                if not result:
+                    return JsonResponse({'error': 'Class not found for the provided class_name and faculty_name'}, status=404)
+                
+                # Lấy `cid` từ kết quả
+                cid = result[0]
+                print("cid nè :",cid)
 
-            # Chuyển đổi giá trị giới tính thành số
-            if gender == 'male' or gender == '1':
-                gender = 1
-            elif gender == 'female' or gender == '0':
-                gender = 0
-            else:
-                logger.warning(f"Invalid gender value: {gender}")
-                return JsonResponse({'error': 'Invalid gender value'}, status=400)
-
-            # Câu truy vấn SQL để cập nhật thông tin người dùng
+            # Cập nhật thông tin người dùng
             update_user_sql = """
                 UPDATE Users
                 SET name = %s,
@@ -575,28 +612,29 @@ def edit_user_view(request):
                     cid = %s
                 WHERE uid = %s
             """
-            update_avatar_sql = """
-                REPLACE INTO Avatars (uid, image)
-                VALUES (%s, %s)
-            """
 
             with connections['default'].cursor() as cursor:
-                # Thực hiện truy vấn để cập nhật người dùng
-                cursor.execute(update_user_sql, (name, email, user_id, birth_date, gender, cid, uid))
+                cursor.execute(update_user_sql, [name, email, user_id, birth_date, gender, cid, uid])
 
-                # Nếu có avatar, cập nhật bảng Avatars
-                if avatar_file:
-                    avatar_data = avatar_file.read()
-                    cursor.execute(update_avatar_sql, (uid, avatar_data))
+            # Cập nhật avatar nếu có
+            if avatar_file:
+                # Đọc dữ liệu tệp
+                avatar_data = avatar_file.read()
+                
+                # Thực hiện truy vấn để cập nhật ảnh đại diện
+                update_avatar_sql = """
+                    REPLACE INTO Avatars (uid, image)
+                    VALUES (%s, %s)
+                """
+                with connections['default'].cursor() as cursor:
+                    cursor.execute(update_avatar_sql, [uid, avatar_data])
 
-            return JsonResponse({'message': 'User and avatar updated successfully'})
+            return JsonResponse({'message': 'User info updated successfully'})
 
         except Exception as e:
-            # Ghi nhật ký lỗi
-            logger.error(f"Error updating user data: {e}")
-            return JsonResponse({'error': 'Error updating user data'}, status=500)
+            logger.error(f"Error updating user info: {e}")
+            return JsonResponse({'error': 'Error updating user info'}, status=500)
 
-    # Trả về lỗi nếu phương thức không phải là POST
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 @csrf_exempt
 def search_books(request):

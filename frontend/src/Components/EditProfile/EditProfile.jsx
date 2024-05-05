@@ -16,13 +16,13 @@ const EditProfile = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [id, setId] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [birth, setBirthDate] = useState("");
   const [gender, setGender] = useState("");
-  const [selectedCid, setSelectedCid] = useState("");
+  const [selectedFid, setSelectedFid] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(defaultUserImage);
   const [avatarFile, setAvatarFile] = useState(null);
-  const [cidList, setCidList] = useState([]);
+  const [fidList, setFidList] = useState([]);
   const [classList, setClassList] = useState([]);
 
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const EditProfile = () => {
     setId("");
     setBirthDate("");
     setGender("");
-    setSelectedCid("");
+    setSelectedFid("");
     setSelectedClass("");
     // setAvatarFile(null);
     // setAvatarPreviewUrl(""); 
@@ -52,7 +52,7 @@ const EditProfile = () => {
           setId(userData.id);
           setBirthDate(userData.birth);
           setGender(userData.gender);
-          setSelectedCid(userData.cid);
+          setSelectedFid(userData.fid);
           setSelectedClass(userData.class_name);
           setAvatarPreviewUrl(
             userData.avatar
@@ -66,25 +66,25 @@ const EditProfile = () => {
     }
   }, [send_uid]);
 
-  // Lấy dữ liệu CID từ back-end
+  // Lấy dữ liệu FID từ back-end
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/get_cids")
+      .get("http://127.0.0.1:8000/get_fids")
       .then((response) => {
-        if (response.data && Array.isArray(response.data.cids)) {
-          setCidList(response.data.cids);
+        if (response.data && Array.isArray(response.data.fids)) {
+          setFidList(response.data.fids);
         }
       })
       .catch((error) => {
-        console.error("Error fetching CID data:", error);
+        console.error("Error fetching FID data:", error);
       });
   }, []);
 
-  // Lấy dữ liệu lớp dựa trên CID đã chọn từ back-end
+  // Lấy dữ liệu lớp dựa trên FID đã chọn từ back-end
   useEffect(() => {
-    if (selectedCid) {
+    if (selectedFid) {
       axios
-        .post("http://127.0.0.1:8000/get_classes/", { cid: selectedCid })
+        .post("http://127.0.0.1:8000/get_classes/", { fid: selectedFid })
         .then((response) => {
           if (response.data && Array.isArray(response.data.classes)) {
             setClassList(response.data.classes);
@@ -94,7 +94,7 @@ const EditProfile = () => {
           console.error("Error fetching classes data:", error);
         });
     }
-  }, [selectedCid]);
+  }, [selectedFid]);
 
   // Xử lý sự kiện Save
   const handleSave = (e) => {
@@ -104,10 +104,10 @@ const EditProfile = () => {
     formData.append("name", name);
     formData.append("email", email);
     formData.append("id", id);
-    formData.append("birthDate", birthDate);
+    formData.append("birth", birth);
     formData.append("gender", gender);
-    formData.append("cid", selectedCid);
-    formData.append("className", selectedClass);
+    formData.append("fid", selectedFid);
+    formData.append("class_name", selectedClass);
     if (avatarFile) {
       formData.append("avatar", avatarFile);
     }
@@ -211,7 +211,7 @@ const EditProfile = () => {
                 <input
                   type="date"
                   class="form-input"
-                  value={birthDate}
+                  value={birth}
                   onChange={(e) => setBirthDate(e.target.value)}
                 />
               </div>
@@ -241,16 +241,16 @@ const EditProfile = () => {
                 </div>
               </div>
               <div class="form-group">
-                <label class="form-label">CID</label>
+                <label class="form-label">Faculty Name</label>
                 <select
                   class="form-input"
-                  value={selectedCid}
-                  onChange={(e) => setSelectedCid(e.target.value)}
+                  value={selectedFid}
+                  onChange={(e) => setSelectedFid(e.target.value)}
                 >
                   <option value="">Select class id</option>
-                  {cidList.map((cid) => (
-                    <option key={cid.value} value={cid.value}>
-                      {cid.text}
+                  {fidList.map((fid) => (
+                    <option key={fid.value} value={fid.value}>
+                      {fid.text}
                     </option>
                   ))}
                 </select>
