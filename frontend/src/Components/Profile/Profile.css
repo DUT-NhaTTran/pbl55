@@ -6,31 +6,18 @@
     align-items:center;
     justify-content: space-bet
 }
-/* .edit{
-    background-color: #dde6ed;
-    padding:12px;
-    border-radius: 10px;
-    color:#969393;
-    display:flex;
-    align-items:center;
-    justify-content: center;
-}
-.edit .icon{
-    font-size: 20px;
-    transition: 0.5s ease-in-out;
-} */
-/* Định dạng cho nút chỉnh sửa (Edit) trong header */
+
 .edit-button {
-    background: none; /* Không có màu nền */
-    border: none; /* Không có đường viền */
-    cursor: pointer; /* Con trỏ chuột khi di qua */
+    background:none;
+    border: none; 
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   
   .edit-button svg {
-    color: #007bff; /* Màu biểu tượng chỉnh sửa */
+    color: white; /* Màu biểu tượng chỉnh sửa */
     transition: color 0.3s ease; /* Hiệu ứng chuyển màu khi di chuột qua */
   }
   .header-title {
@@ -135,3 +122,20 @@
     color: black; 
     font-weight: bold;
 }
+.button-save {
+    background-color: #007BFF; 
+    color: #FFFFFF;
+    padding: 10px 20px; 
+    border: none; 
+    border-radius: 8px;
+    cursor: pointer; 
+    text-align: center; 
+    display: block; 
+    margin: 0 auto;
+}
+
+/* Hiệu ứng di chuột qua nút */
+.button-save:hover {
+    background-color: #0056b3; 
+}
+

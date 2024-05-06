@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Tags from "../Tags/Tags"; // Thành phần Tags
+import Tags from "../Tags/Tags";
 import "../BookList/BookList.css";
-import "../BookList/modal.css"; // Nhập file CSS
+import "../BookList/modal.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BiSearch } from "react-icons/bi";
-
 import ReactModal from "react-modal";
+import { useNavigate } from "react-router-dom";
 
 export default function BookList() {
   const [books, setBooks] = useState([]);
-  const [selectedBook, setSelectedBook] = useState(null); // Sách được chọn
-  const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái Modal
+  const [selectedBooks, setSelectedBooks] = useState([]); // Danh sách sách được chọn
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [SortOption, setSortOption] = useState("");
+
   // Hàm để lấy sách theo tag hoặc tất cả sách
   const fetchBooksByTag = async (tag) => {
     try {
@@ -34,20 +36,19 @@ export default function BookList() {
     }
   };
 
-  // Khi thành phần được render lần đầu, gọi API để lấy tất cả sách
   useEffect(() => {
     fetchBooksByTag("");
   }, []);
+
   const handleSearchChange = async (event) => {
     const query = event.target.value;
-  
     setSearchQuery(query);
-  
     if (query.trim() !== "") {
       try {
         const lowerCaseQuery = query.toLowerCase();
-        const response = await axios.get(`http://127.0.0.1:8000/search_books?query=${lowerCaseQuery}`);
-  
+        const response = await axios.get(
+          `http://127.0.0.1:8000/search_books?query=${lowerCaseQuery}`
+        );
         setBooks(response.data.books);
       } catch (error) {
         console.error("Error fetching books based on search query:", error);
@@ -56,15 +57,15 @@ export default function BookList() {
       fetchAllBooks();
     }
   };
+
   const handleSortChange = async (event) => {
     const sortOption = event.target.value;
-  
     setSortOption(sortOption);
-  
     if (sortOption !== "") {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/sort_books?sortOption=${sortOption}`);
-  
+        const response = await axios.get(
+          `http://127.0.0.1:8000/sort_books?sortOption=${sortOption}`
+        );
         setBooks(response.data.books);
       } catch (error) {
         console.error("Error sorting books:", error);
@@ -73,25 +74,20 @@ export default function BookList() {
       fetchAllBooks();
     }
   };
-  
+
   const fetchAllBooks = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/get_books_info");
-  
       setBooks(response.data.books_info);
     } catch (error) {
       console.error("Error fetching all books:", error);
     }
   };
-  
+
   // Hàm để mở modal và hiển thị thông tin chi tiết sách
   const handleBookClick = (book) => {
-    console.log("Đã bấm vào sách:", book);
-
-    console.log("Sách được chọn:", book);
     setSelectedBook(book);
     setIsModalOpen(true);
-    console.log("Trạng thái modal:", isModalOpen);
   };
 
   // Hàm để đóng modal
@@ -99,10 +95,59 @@ export default function BookList() {
     setIsModalOpen(false);
     setSelectedBook(null);
   };
-  
+
+  // Hàm để xử lý tick chọn sách
+  const handleBookCheckboxChange = (book) => {
+    if (selectedBooks.includes(book)) {
+      // Nếu sách đã được chọn, bỏ chọn
+      setSelectedBooks(selectedBooks.filter((b) => b !== book));
+    } else {
+      // Nếu sách chưa được chọn, chọn
+      setSelectedBooks([...selectedBooks, book]);
+    }
+  };
+  const navigate = useNavigate();
+
+  const handleAddBook = () => {
+    navigate("/home/createbook");
+  };
+
+  const handleEditBook = (bookId) => {
+    
+    
+    navigate('/home/editbook', {
+        state: { send_bookId: bookId },
+    });
+};
+
+  // Hàm xóa sách (ví dụ)
+  const deleteBooks = async () => {
+    if (selectedBooks.length === 0) {
+      console.warn("No books selected for deletion.");
+      return;
+    }
+
+    try {
+      const bookIds = selectedBooks.map((book) => book.id);
+      const response = await axios.post("http://127.0.0.1:8000/delete_books", {
+        ids: bookIds,
+      });
+
+      if (response.data.success) {
+        console.log("Books deleted successfully.");
+        fetchAllBooks(); // Cập nhật lại danh sách sách
+        setSelectedBooks([]);
+      } else {
+        console.error("Failed to delete books:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting books:", error);
+    }
+  };
+
   return (
     <div className="booklist-page">
-      {/* Truyền hàm handleTagSelection cho thành phần Tags */}
+      {/* Thành phần Tags */}
       <Tags onTagSelect={fetchBooksByTag} />
       <div className="search-sort-container row">
         <div className="search-box col-md-6">
@@ -131,17 +176,13 @@ export default function BookList() {
       </div>
       <section className="card-container">
         {books.map((book, index) => (
-          <section
-            key={index}
-            className="card"
-            onClick={() => handleBookClick(book)} // Khi bấm vào sách, mở modal
-          >
+          <section key={index} className="card">
             <img
               src={`data:image/png;base64,${book.book_image}`}
               className="card-img"
               alt="book cover"
             />
-            <div className="card-details">
+            <div className="card-details" onClick={() => handleBookClick(book)}>
               <div className="book-title">
                 <h3>{book.book_name}</h3>
               </div>
@@ -154,14 +195,26 @@ export default function BookList() {
                 <span className="quantity-value">{book.quantity}</span>
               </div>
             </div>
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={selectedBooks.includes(book)}
+              onChange={() => handleBookCheckboxChange(book)}
+            />
           </section>
         ))}
       </section>
 
+      {/* Nút thêm, sửa, và xóa sách */}
+      <div className="book-actions">
+        <button onClick={handleAddBook}>Thêm sách</button>
+        <button onClick={() => deleteBooks()}>Xóa sách</button>
+      </div>
+
       <ReactModal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
-        contentLabel="Chi tiết sách"
+        contentLabel="Book Details"
         className="modal-content"
         overlayClassName="modal-overlay"
       >
@@ -199,6 +252,13 @@ export default function BookList() {
                 <span className="author-value">{selectedBook.description}</span>
               </div>
               <div className="modal-footer">
+                <button
+                  className="edit-button"
+                  onClick={() => handleEditBook(selectedBook.id)}
+                >
+                  Sửa sách
+                </button>
+
                 <button className="close-button" onClick={closeModal}>
                   Đóng
                 </button>

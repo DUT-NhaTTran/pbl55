@@ -13,6 +13,7 @@ const StudentList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(""); // State lưu trữ hàng được chọn
   const [data, setData] = useState([]);
+  
   useEffect(() => {
     // Hàm lấy dữ liệu từ API
     const fetchData = async () => {
@@ -121,7 +122,9 @@ const StudentList = () => {
       selector: (row) => {
         const dateTime = new Date(row.time_in);
         return format(dateTime, "yyyy-MM-dd HH:mm:ss");
+
       },
+      sortable:true,
       wrap: true,
     },
     {
@@ -130,11 +133,13 @@ const StudentList = () => {
         const dateTime = new Date(row.time_out);
         return format(dateTime, "yyyy-MM-dd HH:mm:ss");
       },
+      sortable:true,
       wrap: true,
     },
     {
       name: "Class Name",
       selector: (row) => row.class_name,
+      
     },
   ];
   return (

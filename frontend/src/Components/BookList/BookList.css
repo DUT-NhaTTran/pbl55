@@ -2,7 +2,7 @@
     display: flex;
     flex-wrap: wrap;
     margin-top: 2rem;
-    margin-left: 5rem;
+    margin-left: 3rem;
     max-width: 100%; 
     /*phan chinh can giua*/
     /* justify-content: center; */
@@ -81,6 +81,7 @@
 
 .quantity-value {
     color: #666; 
+
 }
 .control-bar {
     display: flex;

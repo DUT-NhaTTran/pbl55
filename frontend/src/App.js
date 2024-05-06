@@ -1,7 +1,8 @@
 import Content from "./Components/Content/Content";
 import { Outlet } from "react-router-dom";
 import ReactModal from "react-modal";
-
+import CreateBook from "./Components/BookFunction/CreateBook";
+import EditBook from "./Components/BookFunction/EditBook";
 import "./App.css";
 import LoginForm from "./Components/LoginForm/LoginForm";
 import SideBar from "./Components/SideBar/SideBar";
@@ -26,6 +27,9 @@ function App() {
           <Route path="account" element={<Account />} />
           <Route path="booklist" element={<BookList/>}/>
           <Route path="editprofile" element={<EditProfile/>}/>
+          <Route path="createbook" element={<CreateBook/>}/>
+          <Route path="editbook" element={<EditBook/>}/>
+
 
         </Route> 
       </Routes>

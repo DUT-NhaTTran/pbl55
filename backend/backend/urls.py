@@ -37,6 +37,16 @@ urlpatterns = [
     path('edit_user_view', views.edit_user_view, name='edit_user_view'),
     path('search_books', views.search_books, name='search_books'),
     path('sort_books', views.sort_books, name='sort_books'),
+    path('view_borrow_books', views.view_borrow_books, name='view_borrow_books'),
+    path('save_book', views.save_book, name='save_book'),
+    path('delete_books', views.delete_books, name='delete_books'),
+    path('get_book_info', views.get_book_info, name='get_book_info'),
+    path('edit_book', views.edit_book, name='edit_book'),
+
+
+
+
+
 
 
 

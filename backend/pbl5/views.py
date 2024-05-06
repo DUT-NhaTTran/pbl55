@@ -560,7 +560,6 @@ def get_user_info(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 @csrf_exempt
 def edit_user_view(request):
-    print('edit nè')
     if request.method == 'POST':
         try:
            
@@ -574,8 +573,7 @@ def edit_user_view(request):
             class_name = request.POST.get('class_name')
             faculty_name = request.POST.get('fid')
             avatar_file = request.FILES.get('avatar')
-            print('class name nè',class_name)
-            print('faculty_name',faculty_name)
+           
             
             # Kiểm tra uid có tồn tại không
             if not uid:
@@ -623,11 +621,12 @@ def edit_user_view(request):
                 
                 # Thực hiện truy vấn để cập nhật ảnh đại diện
                 update_avatar_sql = """
-                    REPLACE INTO Avatars (uid, image)
-                    VALUES (%s, %s)
+                   UPDATE Avatars
+                        SET image = %s
+                        WHERE uid = %s
                 """
                 with connections['default'].cursor() as cursor:
-                    cursor.execute(update_avatar_sql, [uid, avatar_data])
+                    cursor.execute(update_avatar_sql, [ avatar_data,uid])
 
             return JsonResponse({'message': 'User info updated successfully'})
 
@@ -752,3 +751,245 @@ def sort_books(request):
 
     # Trả về danh sách sách đã sắp xếp dưới dạng JSON
     return JsonResponse({'books': books_list})
+@csrf_exempt
+def view_borrow_books(request):
+    if request.method == 'GET':
+        uid = request.GET.get('uid')
+        print(f"Received UID: {uid}")  # In UID được nhận
+
+
+        # Kiểm tra uid có tồn tại không
+        if not uid:
+            print("UID not provided")
+            return JsonResponse({'error': 'UID not provided'}, status=400)
+
+        get_borrow_book_sql = """
+            SELECT b.id, b.book_name, c.day_borrow, c.day_return, c.limit_day
+            FROM Books b
+            LEFT JOIN Cards c ON b.id = c.bid
+            WHERE c.sid = %s
+        """
+
+        try:
+            with connections['default'].cursor() as cursor:
+                cursor.execute(get_borrow_book_sql, [uid])
+                rows = cursor.fetchall() 
+                print(f"Query result: {rows}")  # In kết quả truy vấn
+ # Fetch all rows from the query
+
+            # Kiểm tra hàng dữ liệu nhận được
+            if not rows:
+                print(f"Book borrow not found with UID: {uid}")
+                return JsonResponse({'error': 'Book borrow not found'}, status=404)
+
+            # Tạo danh sách các thông tin sách mượn
+            borrow_book_info_list = []
+            for row in rows:
+                borrow_book_info = {
+                    'id': row[0],
+                    'book_name': row[1],
+                    'day_borrow': row[2],
+                    'day_return': row[3],
+                    'limit_day': row[4],
+                }
+                borrow_book_info_list.append(borrow_book_info)
+            print(f"Borrow book info list: {borrow_book_info_list}")  # In danh sách thông tin sách mượn
+
+
+            # Trả về danh sách sách mượn dưới dạng JSON
+            return JsonResponse(borrow_book_info_list, safe=False)
+
+        except Exception as e:
+            # Ghi nhật ký lỗi
+            logger.error(f"Error fetching borrow book info: {e}")
+            return JsonResponse({'error': 'Error fetching borrow book info'}, status=500)
+
+    # Trả về lỗi nếu phương thức không phải là GET
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def save_book(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        book_name = request.POST.get('book_name')
+        quantity = request.POST.get('quantity')
+        auth = request.POST.get('author')
+        tag = request.POST.get('tag')
+        description = request.POST.get('description')
+
+        # Nếu có tệp tin ảnh bìa sách, lưu lại
+        book_image = request.FILES.get('book_image')
+        print('in',id,book_name,quantity,auth,tag,description,book_image)
+
+        
+        try:
+            with connections['default'].cursor() as cursor:
+                # Lưu sách vào cơ sở dữ liệu
+                cursor.execute("""
+                    INSERT INTO Books (id, book_name, quantity, auth, tag, description)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (id, book_name, quantity, auth, tag, description))
+                
+                # Nếu có ảnh bìa sách, lưu ảnh vào thư mục chỉ định
+                if book_image:
+                    book_image_data = book_image.read()
+                    insert_book_image_sql = """
+                        INSERT INTO BookImages (bid, book_image)
+                        VALUES (%s, %s)
+                    """
+                # if book_image:
+                #     # Bạn có thể lưu book_image vào một thư mục trên máy chủ của mình, ví dụ:
+                #     # với tên file `book_image.name` trong thư mục chỉ định
+                #     file_path = f'media/book_images/{book_image.name}'
+                #     with open(file_path, 'wb') as f:
+                #         for chunk in book_image.chunks():
+                #             f.write(chunk)
+                    cursor.execute(insert_book_image_sql, (id, book_image_data))
+
+                
+                # Trả về phản hồi thành công
+                return JsonResponse({"success": True, "message": "Book saved successfully."}, status=201)
+                
+        except Exception as e:
+            # Trả về phản hồi lỗi
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
+    else:
+        # Trả về phản hồi lỗi nếu phương thức không phải là POST
+        return JsonResponse({"success": False, "message": "Method not allowed."}, status=405)
+@csrf_exempt
+def delete_books(request):
+    print("xóa")
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            book_ids = data.get('ids', [])
+            
+            if not book_ids:
+                return JsonResponse({"success": False, "message": "No book IDs provided."}, status=400)
+            
+            with connections['default'].cursor() as cursor:
+                cursor.execute("DELETE FROM BookImages WHERE bid IN %s", [tuple(book_ids)])
+                cursor.execute("DELETE FROM Books WHERE id IN %s", [tuple(book_ids)])
+            
+            return JsonResponse({"success": True, "message": "Books and related images deleted successfully."}, status=200)
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
+    else:
+        return JsonResponse({"success": False, "message": "Method not allowed."}, status=405)
+@csrf_exempt
+def get_book_info(request):
+    if request.method == 'GET':
+        try:
+            # Lấy bookId từ yêu cầu
+            book_id = request.GET.get('bookId')
+            print("In bookid ",book_id)
+
+            # Kiểm tra bookId có tồn tại không
+            if not book_id:
+                return JsonResponse({'error': 'Book ID not provided'}, status=400)
+
+            # Truy vấn SQL thô để lấy thông tin sách
+            get_book_sql = """
+                SELECT b.id, b.book_name, b.auth, b.quantity, b.tag, 
+                    b.description, i.book_image
+                FROM Books b
+                LEFT JOIN BookImages i ON b.id = i.bid
+                WHERE b.id = %s
+            """
+
+            with connections['default'].cursor() as cursor:
+
+                # Thực hiện truy vấn SQL thô
+                cursor.execute(get_book_sql, [book_id])
+                row = cursor.fetchone()
+
+                # Kiểm tra nếu không tìm thấy sách
+                if not row:
+                    logger.warning(f"Book not found with ID: {book_id}")
+                    return JsonResponse({'error': 'Book not found'}, status=404)
+
+                # Phân tách dữ liệu từ hàng dữ liệu
+                book_id, book_name, author,quantity,tag, description, book_image = row
+
+                # Nếu có dữ liệu ảnh, chuyển đổi nó sang Base64
+                image_base64 = None
+                if book_image:
+                    image_base64 = base64.b64encode(book_image).decode('utf-8')
+
+                # Tạo từ điển chứa thông tin sách
+                book_info = {
+                    'book_id': book_id,
+                    'book_name': book_name,
+                    'auth': author,
+                    'quantity': quantity,
+                    'tag': tag,
+                    'description': description,
+                    'book_image': image_base64,
+                }
+
+                # Trả về thông tin sách dưới dạng JSON
+                return JsonResponse(book_info)
+
+        except Exception as e:
+            # Ghi nhật ký lỗi
+            logger.error(f"Error fetching book info: {e}")
+            return JsonResponse({'error': 'Error fetching book info'}, status=500)
+
+    # Trả về lỗi nếu phương thức không phải là GET
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def edit_book(request):
+    print('edit book nè')
+    if request.method == 'POST':
+        try:
+            
+            book_id = request.POST.get('book_id')
+            book_name = request.POST.get('book_name')
+            author = request.POST.get('auth')
+            quantity = request.POST.get('quantity')
+            tag = request.POST.get('tag')
+            description =request.POST.get('description')
+            book_image = request.FILES.get('book_image')
+            
+            # Kiểm tra xem book_id có tồn tại không
+            if not book_id:
+                return JsonResponse({'error': 'Book ID not provided'}, status=400)
+            
+            # Câu truy vấn SQL để cập nhật thông tin sách
+            update_book_sql = """
+                UPDATE Books
+                SET book_name = %s, auth = %s, quantity = %s,
+                  tag = %s, description = %s
+                WHERE id = %s
+            """
+            
+            # Ghi nhật ký câu truy vấn SQL và giá trị
+            
+            with connections['default'].cursor() as cursor:
+                # Cập nhật thông tin sách trong bảng Books
+                cursor.execute(update_book_sql, [
+                    book_name, author, quantity, 
+                    tag, description, book_id
+                ])
+                
+                # Cập nhật ảnh sách nếu có
+                if book_image:
+                    book_image_data = book_image.read()                    
+                    update_image_sql = """
+                        UPDATE BookImages
+                        SET book_image = %s
+                        WHERE bid = %s
+                    """
+                   
+                    
+                    cursor.execute(update_image_sql, [book_image_data, book_id])
+            
+            # Trả về phản hồi thành công
+            return JsonResponse({"success": True, "message": "Book edited successfully."}, status=200)
+        
+        except Exception as e:
+            # Trả về phản hồi lỗi nếu có bất kỳ vấn đề nào
+            return JsonResponse({'error': f'Error editing book: {e}'}, status=500)
+    
+    # Trả về lỗi nếu phương thức không phải là POST
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
