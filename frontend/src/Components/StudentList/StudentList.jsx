@@ -6,14 +6,14 @@ import "../StudentList/StudentList.css";
 import Profile from "../Profile/Profile";
 import "../Profile/Profile.css";
 import { format } from "date-fns";
-
+import { useNotification } from "../Noti/Noti";
 const StudentList = () => {
   const [records, setRecords] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(""); // State lưu trữ hàng được chọn
   const [data, setData] = useState([]);
-  
+  const {showNotification}=useNotification();
   useEffect(() => {
     // Hàm lấy dữ liệu từ API
     const fetchData = async () => {
@@ -67,7 +67,7 @@ const StudentList = () => {
   // Hàm handleDeleteSelected để xóa bản ghi đã chọn
   const handleDeleteSelected = async () => {
     if (selectedRows.length === 0) {
-      alert("Please select records to delete.");
+      showNotification("Please select records to delete.","error");
       return;
     }
 
@@ -76,12 +76,12 @@ const StudentList = () => {
         data: { uids: selectedRows },
       });
 
-      alert("Records deleted successfully.");
+      showNotification("Records deleted successfully.","success");
       fetchData();
       setSelectedRows([]);
     } catch (err) {
       console.error("Error deleting records:", err);
-      alert("Error deleting records.");
+      showNotification("Error deleting records.","error");
     }
   };
 

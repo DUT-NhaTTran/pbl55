@@ -16,6 +16,10 @@ const Profile = ({ selectedRecord }) => {
   
     const columns = [
       {
+        name: "Book ID",
+        selector: (row) => row.id,
+      },
+      {
         name: "Book Name",
         selector: (row) => row.book_name,
       },

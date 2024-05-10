@@ -136,4 +136,80 @@
     margin-bottom: 20px; /* Khoảng cách dưới để tách khỏi phần khác */
     
   }
-  
+.book-actions {
+    display: flex; /* Sử dụng flexbox */
+    justify-content: flex-end; /* Căn chỉnh các nút về phía bên phải */
+    padding: 10px; /* Khoảng cách bên trong */
+}
+
+.book-actions button {
+    margin-left: 10px; /* Khoảng cách giữa các nút */
+    padding: 8px 12px; /* Khoảng cách bên trong nút */
+    border: none; /* Bỏ viền mặc định */
+    background-color: #007bff; /* Màu nền cho nút */
+    color: white; /* Màu chữ */
+    border-radius: 4px; /* Đường viền cong */
+    cursor: pointer; /* Con trỏ chuột thay đổi khi di chuột qua */
+}
+
+.book-actions button:hover {
+    background-color: #0056b3; /* Màu nền thay đổi khi di chuột qua */
+}
+
+/* Lớp CSS cho phần tử cha chứa book-actions và Tags */
+.booklist-page-container {
+    display: flex; /* Biến phần tử cha thành flex container */
+    justify-content: space-between; /* Căn chỉnh phần tử con cách đều nhau */
+    align-items: center; /* Căn chỉnh phần tử con theo chiều dọc */
+}
+
+.advanced-search-container {
+    margin: 20px 0 20px 20px;
+}
+
+.advanced-search-fields {
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out; /* Hiệu ứng chuyển đổi chiều cao */
+}
+
+.advanced-search-fields.open {
+    max-height: 300px; /* Chiều cao tối đa khi mở */
+}
+
+.advanced-search-fields.closed {
+    max-height: 0; /* Chiều cao tối thiểu khi đóng */
+    visibility: hidden; /* Ẩn khi đóng */
+}
+/* CSS cho nút "edit-button-1" */
+.edit-button-1 {
+    background-color: #007bff; /* Màu nền xanh đậm */
+    color: #fff; /* Màu chữ trắng */
+    border: none; /* Loại bỏ đường viền */
+    padding: 8px 16px; /* Padding cho nút */
+    border-radius: 4px; /* Bo tròn các góc */
+    cursor: pointer; /* Con trỏ chuột trở thành bàn tay khi di chuột qua */
+    font-weight: bold; /* Tăng độ đậm của chữ */
+    transition: background-color 0.3s; /* Thêm hiệu ứng chuyển đổi màu nền */
+    margin-right:80px;
+}
+
+.edit-button-1:hover {
+    background-color: #0056b3; 
+}
+
+/* CSS cho nút "close-button-2" */
+.close-button-2 {
+    background-color: #28a745; /* Màu nền xanh lá */
+    color: #fff; /* Màu chữ trắng */
+    border: none; /* Loại bỏ đường viền */
+    padding: 8px 16px; /* Padding cho nút */
+    border-radius: 4px; /* Bo tròn các góc */
+    cursor: pointer; /* Con trỏ chuột trở thành bàn tay khi di chuột qua */
+    font-weight: bold; /* Tăng độ đậm của chữ */
+    transition: background-color 0.3s; /* Thêm hiệu ứng chuyển đổi màu nền */
+    align-items: flex-end;
+}
+
+.close-button-2:hover {
+    background-color: #218838; /* Màu nền xanh lá đậm hơn khi di chuột qua */
+}

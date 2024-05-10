@@ -5,38 +5,48 @@ import { Link, useNavigate } from "react-router-dom";
 import Validation from "./LoginValidation";
 import axios from "axios";
 import { useState } from "react";
-
+import { setAuthInfo, getAuthInfo, clearAuthInfo } from "./auth";
+import { useNotification } from "../Noti/Noti";
 const LoginForm = () => {
+  const handleForgotPasswordClick = () => {
+    navigate("/changeaccount"); // Chuyển hướng người dùng đến trang ChangeAccount
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrors(Validation(values));
-   
+
     if (errors.usernameTxt === "" && errors.passwordTxt === "") {
-      
       axios
         .post("http://127.0.0.1:8000/account", values)
         .then((res) => {
-          if (res.data === 'Success') {
+          console.log('Response data:', res.data);
+          if (res.data.message === "Success") {
+
+            const { username, role } = res.data;
+            console.log('auth', username, role);
             
+          
+            // Lưu thông tin đăng nhập
+            setAuthInfo(username, role);
             navigate("/Home");
-          } else {
-            alert("No record");
+          } else{
+            showNotification("No record","error");
           }
         })
         .catch((err) => console.log(err));
     }
   };
+  const {showNotification}=useNotification();
   const navigate = useNavigate();
   const [values, setValues] = useState({
-    usernameTxt: '',
-    passwordTxt: ''
-  })
+    usernameTxt: "",
+    passwordTxt: "",
+  });
   const [errors, setErrors] = useState({});
   const handleInput = (e) => {
-    setValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
   return (
-
     <div className="wrapper">
       <form action="" onSubmit={handleSubmit}>
         <h1>Login</h1>
@@ -71,14 +81,11 @@ const LoginForm = () => {
             <input type="checkbox" />
             Remember Me
           </label>
-          <a href="#">Forgot password ?</a>
+          <a href="#" onClick={handleForgotPasswordClick}>
+            Forgot password?
+          </a>
         </div>
         <button type="submit">Login</button>
-        <div className="register-link">
-          <p>
-            Don't have an account ? <a href="#">Register</a>
-          </p>
-        </div>
       </form>
     </div>
   );

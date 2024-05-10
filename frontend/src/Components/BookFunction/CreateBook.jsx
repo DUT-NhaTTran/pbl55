@@ -1,9 +1,9 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../Create/Create.css";
+import "../BookFunction/CreateBook.css";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useNotification } from "../Noti/Noti";
 const CreateBook = () => {
   const [id, setId] = useState("");
   const [bookName, setBookName] = useState("");
@@ -11,7 +11,7 @@ const CreateBook = () => {
   const [author, setAuthor] = useState("");
   const [tag, setTag] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
-
+  const {showNotification}=useNotification();
   const [description, setDescription] = useState("");
   const [bookImage, setBookImage] = useState(null);
   const [bookImagePreviewUrl, setBookImagePreviewUrl] = useState("");
@@ -64,9 +64,15 @@ const CreateBook = () => {
   };
 
   // Hàm xử lý lưu thông tin sách
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault(); // Ngăn chặn form submit mặc định
 
+    if (!id || !bookName || !quantity || !author || !selectedTag || !description || !bookImage) {
+        showNotification("Please fill out all fields, including book image.", "error");
+        return;
+    }
+
+    // Tiếp tục với việc chuẩn bị formData
     const formData = new FormData();
 
     // Thêm dữ liệu vào formData
@@ -75,35 +81,32 @@ const CreateBook = () => {
     formData.append("quantity", quantity);
     formData.append("author", author);
     formData.append("tag", selectedTag);
-
     formData.append("description", description);
 
     // Thêm ảnh bìa sách vào formData nếu nó tồn tại
-    if (bookImage) {
-      formData.append("book_image", bookImage);
-    }
+    formData.append("book_image", bookImage);
 
-    // Gọi API và gửi formData
-    axios
-      .post("http://127.0.0.1:8000/save_book", formData)
-      .then((response) => {
+    try {
+        // Gọi API và gửi formData
+        const response = await axios.post("http://127.0.0.1:8000/save_book", formData);
         console.log("Book saved successfully:", response.data);
+        showNotification("Book saved successfully.", "success");
         navigate("/home/booklist");
-      })
-      .catch((error) => {
+    } catch (error) {
         console.error("Error saving book data:", error);
-      });
-  };
+        showNotification("Error saving book data.", "error");
+    }
+};
 
   return (
-    <div>
+    <div className="full-width">
       <div className="header">Create Book</div>
       <div className="book-container">
         <div className="book-header">
           <img
             src={bookImagePreviewUrl || "https://via.placeholder.com/150"}
             alt="Book Cover"
-            className="book-image"
+            className="avatar"
           />
           <div className="book-actions">
             <label className="upload-button">
@@ -116,7 +119,7 @@ const CreateBook = () => {
             </label>
             <button
               type="button"
-              className="reset-button"
+              className="reset-button-3"
               onClick={handleReset}
             >
               Reset

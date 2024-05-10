@@ -1,0 +1,153 @@
+/* Create.css */
+.book-container {
+    width: 100%;
+    padding: 10px;
+    background-color: #f7f7f7;
+    border-radius:10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.full-width {
+    width: 100%;
+    margin: 0; /* Loại bỏ margin mặc định */
+    padding: 0; /* Loại bỏ padding mặc định */
+    display: flex;
+    flex-direction: column;
+}
+
+
+.header {
+    font-size: 32px; /* Điều chỉnh kích thước chữ */
+    color:#526d82;
+    margin-bottom: 10px; /* Khoảng cách dưới */
+    text-align: left; /* Căn trái */
+}
+
+   
+
+.book-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.book-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.upload-button {
+    position: relative;
+    display: inline-block;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.upload-button input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.book-actions .reset-button-3 {
+    background-color: red;
+    color: #fff;
+    border: none;
+    padding: 8px 26px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left:780px;
+
+}
+
+.divider {
+    margin: 20px 0;
+    border-top: 1px solid #ccc;
+}
+
+.book-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    padding:10px;
+}
+
+.form-label {
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+}
+
+.gender-options {
+    display: flex;
+    gap: 100px;
+    padding:9px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.radio-label input[type="radio"] {
+    margin-right: 2dvw;
+}
+
+.form-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.select {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+}
+.button-group {
+    display: flex;
+    justify-content: right;
+    gap:10px;
+    
+}
+
+.btn-save {
+    background-color: #007bff; 
+    color: #fff;
+    padding: 8px 26px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 50px 50px 0px 20px;
+}
+
+.btn-cancel {
+    background-color: #fff; 
+    color: #000;
+    padding: 8px 26px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 50px 10px 0px 20px;
+
+}

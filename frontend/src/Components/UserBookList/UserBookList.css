@@ -1,45 +1,41 @@
-.profile{
+.book{
     flex:1;
 }
-.profile--header{
+.book-list-background {
+    background-color: #f5f5f5; 
+    padding: 10px; 
+    border-radius: 10px; 
+    flex:1;
+}
+
+.book--header{
     display:flex;
     align-items:center;
     justify-content: space-bet
-}
+    }
 
-.edit-button {
-    background:none;
-    border: none; 
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .edit-button svg {
-    color: white; /* Màu biểu tượng chỉnh sửa */
-    transition: color 0.3s ease; /* Hiệu ứng chuyển màu khi di chuột qua */
-  }
+
   .header-title {
     font-size: 30px; 
     font-weight: bold;
     color:#526d82;
     margin-right: auto; /* Đẩy tiêu đề sang bên trái */
+    
   }
-  .edit-button:hover svg {
-    color: #0056b3; /* Màu biểu tượng khi di chuột qua */
-  }
+ 
   
-.user--profile{
+.book--info{
     height: 85%;
     margin-top:2rem;
     border-radius: 10px;
     background:#dde6ed;
+
     flex-direction: column;
     display: flex;
     padding:10px;
+    
 }
-.user--detail{
+.book--detail{
     width: 100%;
     height: 450px;
     display: flex;
@@ -47,9 +43,9 @@
     flex-direction: column;
     justify-content: center;
 }
-.user--detail img{
+.book--detail img{
     background: #fff;
-    border-radius: 50%;
+    /* border-radius: 50%; */
     width: 150px;
     height: 150px;
     margin-bottom: 10px;
@@ -69,41 +65,25 @@
     gap:10px;
     
 }
+
 .profile_uid{
     color: #969696;
 }
-.profile_info {
-    padding: 10px; 
+.book_info {
+    padding: 30px; 
+    margin-left:10px;
 }
 
 .profile_info div {
     margin-bottom: 10px; /* Khoảng cách giữa các mục */
     display: flex; /* Sử dụng flexbox để canh trái nhãn và nội dung */
-    align-items: center; /* Căn giữa nội dung */
+    align-items: left; /* Căn giữa nội dung */
    
 }
 
 .profile_info div strong {
-    width: 80px; /* Chiều rộng cố định cho nhãn */
-    text-align: left; /* Canh trái nhãn */
-
+    width: 80px;
     color: black; 
     font-weight: bold;
-}
-.button-save {
-    background-color: #007BFF; 
-    color: #FFFFFF;
-    padding: 10px 20px; 
-    border: none; 
-    border-radius: 8px;
-    cursor: pointer; 
-    text-align: center; 
-    display: block; 
-    margin: 0 auto;
-}
-
-/* Hiệu ứng di chuột qua nút */
-.button-save:hover {
-    background-color: #0056b3; 
 }
 

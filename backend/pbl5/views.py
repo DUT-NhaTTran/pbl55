@@ -10,21 +10,61 @@ def account_view(request):
         data = json.loads(request.body)
         username = data.get('usernameTxt')
         password = data.get('passwordTxt')
-        print(request.POST)
-
 
         with connections['default'].cursor() as cursor:
-            sql = "SELECT * FROM Accounts WHERE username = %s AND password = %s"
+            sql = "SELECT username, role FROM Accounts WHERE username = %s AND password = %s"
             cursor.execute(sql, [username, password])
-            
-            data = cursor.fetchall()
-        
-        if data:
-            return JsonResponse('Success', safe=False)
+            result = cursor.fetchone()
+
+        if result:
+            db_username, role = result
+            # Trả về JSON chứa username và role cùng với message
+            return JsonResponse({
+                'message': 'Success',
+                'username': db_username,
+                'role': role
+            })
         else:
-            return JsonResponse('Failed', safe=False)
+             return JsonResponse({
+                'message': 'Fail',
+              
+            })
     else:
-        return JsonResponse('Method not allowed', status=405)
+        return JsonResponse({'message': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+
+
+def account_change_view(request):
+    if request.content_type == 'application/json':
+        try:
+            # Tải dữ liệu JSON từ yêu cầu
+            data = json.loads(request.body)
+            username = data.get('usernameTxt')
+            password = data.get('passwordTxt')
+            newpassword = data.get('newpasswordTxt')
+            reenterpassword = data.get('reenterpasswordTxt')
+            
+            # In ra thông tin đầu vào (nếu cần)
+            print('Thông tin:', username, password, newpassword, reenterpassword)
+
+            # Kết nối với cơ sở dữ liệu và thực hiện truy vấn
+            with connections['default'].cursor() as cursor:
+                sql = "UPDATE Accounts SET password = %s WHERE username = %s AND password = %s"
+                cursor.execute(sql, [newpassword, username, password])
+                
+                if cursor.rowcount > 0:
+                    return JsonResponse('Success', safe=False)
+                else:
+                    return JsonResponse('Failed', safe=False)
+
+        except Exception as e:
+            return JsonResponse({'message': f'An error occurred: {str(e)}'}, status=500)
+    else:
+        return JsonResponse({'message': 'Method not allowed'}, status=405)
+
+
+
 @csrf_exempt
 
 def user_list_view(request):
@@ -242,7 +282,7 @@ logger = logging.getLogger(__name__)
 
 @csrf_exempt
 
-def save_user_view(request):
+def     save_user_view(request):
     if request.method == 'POST':
         try:
             uid = request.POST.get('uid')
@@ -303,7 +343,9 @@ def save_user_view(request):
         except Exception as e:
             # Ghi nhật ký lỗi
             logger.error(f"Error saving user data: {e}")
-            return JsonResponse({'error': 'Error saving user data'}, status=500)
+            return JsonResponse({'error': f"Error saving user data: {e}"}, status=500)
+
+
 
     # Trả về lỗi nếu phương thức không phải là POST
     return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -755,7 +797,6 @@ def sort_books(request):
 def view_borrow_books(request):
     if request.method == 'GET':
         uid = request.GET.get('uid')
-        print(f"Received UID: {uid}")  # In UID được nhận
 
 
         # Kiểm tra uid có tồn tại không
@@ -774,8 +815,6 @@ def view_borrow_books(request):
             with connections['default'].cursor() as cursor:
                 cursor.execute(get_borrow_book_sql, [uid])
                 rows = cursor.fetchall() 
-                print(f"Query result: {rows}")  # In kết quả truy vấn
- # Fetch all rows from the query
 
             # Kiểm tra hàng dữ liệu nhận được
             if not rows:
@@ -793,7 +832,6 @@ def view_borrow_books(request):
                     'limit_day': row[4],
                 }
                 borrow_book_info_list.append(borrow_book_info)
-            print(f"Borrow book info list: {borrow_book_info_list}")  # In danh sách thông tin sách mượn
 
 
             # Trả về danh sách sách mượn dưới dạng JSON
@@ -993,3 +1031,56 @@ def edit_book(request):
     
     # Trả về lỗi nếu phương thức không phải là POST
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+@csrf_exempt
+def search_books_dtb(request):
+    if request.method == 'GET':
+        search_query = request.GET.get('searchQuery', '')
+        username = request.GET.get('username')
+        print("searh username nè ",username)
+        # Kiểm tra nếu không có searchQuery
+        if not search_query:
+            return JsonResponse({'error': 'searchQuery is required'}, status=400)
+
+        # Truy vấn SQL để tìm sách có tên chứa searchQuery
+        sql = """
+        SELECT
+            b.id,
+            b.book_name,
+            c.day_borrow,
+            c.day_return,
+            c.limit_day
+        FROM
+            Books AS b
+        JOIN
+            Cards AS c ON c.bid = b.id
+        WHERE
+            c.sid = %s
+            AND b.book_name LIKE %s ;
+        """
+
+        try:
+            # Thực thi truy vấn và lấy dữ liệu
+            with connections['default'].cursor() as cursor:
+                
+                cursor.execute(sql, [username, f'%{search_query}%'])
+                data = cursor.fetchall()
+
+            # Chuyển đổi dữ liệu thành danh sách dictionary
+            results = []
+            for row in data:
+                results.append({
+                    'id': row[0],
+                    'book_name': row[1],
+                    'day_borrow': row[2],
+                    'day_return': row[3],
+                    'limit_day': row[4],
+                })
+
+            # Trả về kết quả dưới dạng JSON
+            return JsonResponse(results, safe=False)
+
+        except Exception as e:
+            print(f"Error processing request: {e}")
+            return JsonResponse({'error': 'Error processing request'}, status=500)
+
+    return HttpResponseBadRequest("Method not allowed")

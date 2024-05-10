@@ -22,6 +22,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('account', views.account_view, name='account'),
+    path('account_change',views.account_change_view,name='account_change'),
     path('user', views.user_list_view, name='user'),
     path('user/search', views.user_search_view, name='user/search'),
     path('user/delete', views.user_delete_view, name='user/delete'),
@@ -42,6 +43,7 @@ urlpatterns = [
     path('delete_books', views.delete_books, name='delete_books'),
     path('get_book_info', views.get_book_info, name='get_book_info'),
     path('edit_book', views.edit_book, name='edit_book'),
+    path('search_books_dtb/', views.search_books_dtb, name='search_books_dtb'),
 
 
 

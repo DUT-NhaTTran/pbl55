@@ -12,28 +12,35 @@ import Create from "./Components/Create/Create";
 import Account from "./Components/Create/Account";
 import BookList from "./Components/BookList/BookList";
 import EditProfile from "./Components/EditProfile/EditProfile";
-ReactModal.setAppElement('#root');
+import ChangeAccount from "./Components/LoginForm/ChangeAccount";
+import User from "./Components/User/User";
+import { NotificationProvider } from "./Components/Noti/Noti";
+import EditStudentProfile from "./Components/EditProfile/EditStudentProfile";
+ReactModal.setAppElement("#root");
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LoginForm />} />
-        <Route path="/home" element={<Home />}>
-          {/* Các tuyến đường con cho Home */}
-          <Route path="" element={<Content />} />
-          <Route path="content" element={<Content />} />
-          <Route path="create" element={<Create />} />
-          <Route path="account" element={<Account />} />
-          <Route path="booklist" element={<BookList/>}/>
-          <Route path="editprofile" element={<EditProfile/>}/>
-          <Route path="createbook" element={<CreateBook/>}/>
-          <Route path="editbook" element={<EditBook/>}/>
-
-
-        </Route> 
-      </Routes>
-    </BrowserRouter>
+    <NotificationProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LoginForm />} />
+          <Route path="/changeaccount" element={<ChangeAccount />} />
+          <Route path="/home" element={<Home />}>
+            {/* Các tuyến đường con cho Home */}
+            <Route path="" element={<Content />} />
+            <Route path="content" element={<Content />} />
+            <Route path="create" element={<Create />} />
+            <Route path="account" element={<Account />} />
+            <Route path="booklist" element={<BookList />} />
+            <Route path="editprofile" element={<EditProfile />} />
+            <Route path="createbook" element={<CreateBook />} />
+            <Route path="editbook" element={<EditBook />} />
+            <Route path="user" element={<User />} />
+            <Route path="editstudentprofile" element={<EditStudentProfile />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </NotificationProvider>
   );
 }
 function Home() {
@@ -46,6 +53,5 @@ function Home() {
     </div>
   );
 }
-
 
 export default App;

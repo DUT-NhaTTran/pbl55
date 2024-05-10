@@ -1,0 +1,40 @@
+
+.data-column {
+    padding: 20px; /* Điều chỉnh padding theo nhu cầu */
+    margin: 0;
+    border-right: 1px solid #ccc; /* Điều chỉnh đường kẻ giữa các cột */
+}
+.student--detail{
+    display:flex;
+    align-items: center;
+    gap:20px;
+    color:#526d82;
+}
+.student--detail img{
+    width: 50px;
+    background: #dde6ed;
+    border-radius: 50%;
+}
+
+.book-list-container {
+    display: flex; /* Sử dụng flexbox để tạo layout hai cột */
+    border-radius: 20px;
+    width: 100%;
+
+}
+.datatable-full {
+   
+    flex:1;
+
+
+}
+.datatable-split {
+   flex:7;
+
+}
+.profile-split {
+   flex:3;
+   margin-left: 20px;
+}
+
+  

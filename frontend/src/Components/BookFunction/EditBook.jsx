@@ -188,7 +188,7 @@ const EditBook = () => {
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                 >
-                  <option value="">Select Category</option>
+                  
                   {categoryList.map((category) => (
                     <option key={category.value} value={category.value}>
                       {category.text}

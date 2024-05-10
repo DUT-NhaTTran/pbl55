@@ -1,24 +1,153 @@
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useNotification } from "../Noti/Noti";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../Create/Create.css";
-import axios from "axios";
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Create = () => {
-  // Quản lý các trạng thái để lưu trữ dữ liệu đầu vào từ biểu mẫu
-  const [fidList, setFidList] = useState([]);
-  const [selectedFid, setSelectedFid] = useState("");
-  const [classList, setClassList] = useState([]);
-  const [uid, setUid] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [id, setId] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [gender, setGender] = useState("");
-  const [selectedClass, setSelectedClass] = useState("");
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(""); // URL của ảnh đã chọn
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
+  
+  const [fidList, setFidList] = useState([]);
+  const [classList, setClassList] = useState([]);
+  const [uid, setUid] = useState(localStorage.getItem("uid") || "");
+  const [name, setName] = useState(localStorage.getItem("name") || "");
+  const [email, setEmail] = useState(localStorage.getItem("email") || "");
+  const [id, setId] = useState(localStorage.getItem("id") || "");
+  const [birthDate, setBirthDate] = useState(localStorage.getItem("birthDate") || "");
+  const [gender, setGender] = useState(localStorage.getItem("gender") || "");
+  const [selectedFid, setSelectedFid] = useState(localStorage.getItem("selectedFid") || "");
+  const [selectedClass, setSelectedClass] = useState(localStorage.getItem("selectedClass") || "");
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState("");
+
+  // Xử lý khi người dùng chọn file ảnh
+  const handleFileChange = useCallback((e) => {
+    const file = e.target.files[0];
+    setAvatarFile(file);
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64Image = e.target.result;
+        setAvatarPreviewUrl(base64Image);
+        localStorage.setItem("avatarImage", base64Image);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  // Sử dụng useCallback cho handleInputChange
+  const handleInputChange = useCallback((setter) => (event) => {
+    const { name, value } = event.target;
+    setter(value);
+    localStorage.setItem(name, value);
+  }, []);
+
+  // Xử lý lưu thông tin người dùng
+  const handleSave = useCallback(async (e) => {
+    e.preventDefault();
+
+    // Kiểm tra các trường để đảm bảo chúng không được để trống
+    if (!uid || !name || !email || !id || !birthDate || !gender || !selectedFid || !selectedClass) {
+        showNotification("All fields are required.", "error");
+        return;
+    }
+
+    // Kiểm tra avatarFile là bắt buộc
+    if (!avatarFile) {
+        showNotification("Avatar file is required.", "error");
+        return;
+    }
+
+    // Tạo FormData để gửi dữ liệu đến API
+    const formData = new FormData();
+    formData.append("uid", uid);
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("id", id);
+    formData.append("birthDate", birthDate);
+    formData.append("gender", gender);
+    formData.append("fid", selectedFid);
+    formData.append("class_name", selectedClass);
+    formData.append("avatar", avatarFile);
+
+    try {
+        await axios.post("http://127.0.0.1:8000/save_user", formData);
+        showNotification("User saved successfully", "success");
+        localStorage.setItem("uid", uid);
+        localStorage.setItem("name", name);
+        localStorage.setItem("email", email);
+        localStorage.setItem("id", id);
+        localStorage.setItem("birthDate", birthDate);
+        localStorage.setItem("gender", gender);
+        localStorage.setItem("selectedFid", selectedFid);
+        localStorage.setItem("selectedClass", selectedClass);
+        localStorage.setItem("avatarImage", avatarPreviewUrl);
+        navigate("/home/account");
+    } catch (error) {
+        showNotification("ID sinh viên đã tồn tại", "error");
+    }
+  }, [
+    uid, name, email, id, birthDate, gender, selectedFid, selectedClass, avatarFile, showNotification, navigate
+  ]);
+
+  // Sử dụng useEffect để khôi phục lại avatarPreviewUrl từ localStorage
+  useEffect(() => {
+    const savedAvatarImage = localStorage.getItem("avatarImage");
+    if (savedAvatarImage) {
+      setAvatarPreviewUrl(savedAvatarImage);
+    }
+  }, []);
+
+  // Sử dụng useEffect để khôi phục lại trạng thái từ localStorage
+  useEffect(() => {
+    const savedUid = localStorage.getItem("uid");
+    const savedName = localStorage.getItem("name");
+    const savedEmail = localStorage.getItem("email");
+    const savedId = localStorage.getItem("id");
+    const savedBirthDate = localStorage.getItem("birthDate");
+    const savedGender = localStorage.getItem("gender");
+    const savedSelectedFid = localStorage.getItem("selectedFid");
+    const savedSelectedClass = localStorage.getItem("selectedClass");
+
+    if (savedUid) setUid(savedUid);
+    if (savedName) setName(savedName);
+    if (savedEmail) setEmail(savedEmail);
+    if (savedId) setId(savedId);
+    if (savedBirthDate) setBirthDate(savedBirthDate);
+    if (savedGender) setGender(savedGender);
+    if (savedSelectedFid) setSelectedFid(savedSelectedFid);
+    if (savedSelectedClass) setSelectedClass(savedSelectedClass);
+  }, []);
+
+  // Sử dụng useEffect để đọc danh sách FID và class từ API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [fidResponse, classResponse] = await Promise.all([
+          axios.get("http://127.0.0.1:8000/get_fids"),
+          selectedFid && axios.post("http://127.0.0.1:8000/get_classes/", {
+            fid: selectedFid,
+          }),
+        ]);
+
+        if (fidResponse.data && Array.isArray(fidResponse.data.fids)) {
+          setFidList(fidResponse.data.fids);
+        }
+
+        if (classResponse && classResponse.data && Array.isArray(classResponse.data.classes)) {
+          setClassList(classResponse.data.classes);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [selectedFid]);
+
   const handleReset = () => {
     setUid("");
     setName("");
@@ -30,81 +159,6 @@ const Create = () => {
     setSelectedClass("");
     setAvatarFile(null);
     setAvatarPreviewUrl(""); // Đặt lại URL của ảnh đã chọn
-};
-  // Xử lý khi người dùng chọn file ảnh
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setAvatarFile(file);
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        setAvatarPreviewUrl(e.target.result); // Lưu URL của ảnh đã chọn
-      };
-
-      reader.readAsDataURL(file); // Đọc file và tạo URL
-    }
-  };
-
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/get_fids")
-      .then((response) => {
-        if (response.data && Array.isArray(response.data.fids)) {
-          setFidList(response.data.fids);
-        } else {
-          console.error("Unexpected response format:", response.data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching FID data:", error);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (selectedFid) {
-      axios
-        .post("http://127.0.0.1:8000/get_classes/", { fid: selectedFid })
-        .then((response) => {
-          const classes = response.data.classes;
-          setClassList(classes);
-        })
-        .catch((error) => {
-          console.error("Error fetching classes data:", error);
-        });
-    }
-  }, [selectedFid]);
-  const handleSave = (e) => {
-    e.preventDefault(); // Ngăn chặn form submit mặc định
-
-    const formData = new FormData();
-
-    // Thêm dữ liệu vào formData
-    formData.append("uid", uid);
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("id", id);
-    formData.append("birthDate", birthDate);
-    formData.append("gender", gender);
-    formData.append("fid", selectedFid);
-    formData.append("class_name", selectedClass);
-
-    // Thêm avatarFile vào formData nếu nó tồn tại
-    if (avatarFile) {
-      formData.append("avatar", avatarFile);
-    }
-
-    // Gọi API và gửi formData
-    axios
-      .post("http://127.0.0.1:8000/save_user", formData)
-      .then((response) => {
-        console.log("User saved successfully:", response.data);
-        navigate("/home/account");
-      })
-      .catch((error) => {
-        console.error("Error saving user data:", error);
-      });
   };
 
   return (
@@ -141,7 +195,6 @@ const Create = () => {
         <hr className="divider" />
         <div className="profile-form">
           <div className="row">
-            {/* Cột 1 */}
             <div className="col-md-6">
               <div className="form-group">
                 <label className="form-label">UID</label>
@@ -149,7 +202,7 @@ const Create = () => {
                   type="text"
                   className="form-input"
                   value={uid}
-                  onChange={(e) => setUid(e.target.value)}
+                  onChange={handleInputChange(setUid)}
                 />
               </div>
               <div className="form-group">
@@ -158,7 +211,7 @@ const Create = () => {
                   type="text"
                   className="form-input"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={handleInputChange(setName)}
                 />
               </div>
               <div className="form-group">
@@ -167,7 +220,7 @@ const Create = () => {
                   type="email"
                   className="form-input"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleInputChange(setEmail)}
                 />
               </div>
               <div className="form-group">
@@ -176,11 +229,10 @@ const Create = () => {
                   type="text"
                   className="form-input"
                   value={id}
-                  onChange={(e) => setId(e.target.value)}
+                  onChange={handleInputChange(setId)}
                 />
               </div>
             </div>
-            {/* Cột 2 */}
             <div className="col-md-6">
               <div className="form-group">
                 <label className="form-label">Birth Date</label>
@@ -188,7 +240,7 @@ const Create = () => {
                   type="date"
                   className="form-input"
                   value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
+                  onChange={handleInputChange(setBirthDate)}
                 />
               </div>
               <div className="form-group">
@@ -217,15 +269,13 @@ const Create = () => {
                 </div>
               </div>
               <div className="form-group">
-                <label className="form-label">Falculty Name</label>
+                <label className="form-label">Faculty Name</label>
                 <select
                   className="form-input"
                   value={selectedFid}
-                  onChange={(e) => setSelectedFid(e.target.value)}
+                  onChange={handleInputChange(setSelectedFid)}
                 >
-                  {/* Tùy chọn mặc định */}
                   <option value="">Select Faculty Name</option>
-                  {/* Lặp qua danh sách FID để tạo các tùy chọn */}
                   {fidList.map((fid) => (
                     <option key={fid.value} value={fid.value}>
                       {fid.text}
@@ -238,12 +288,10 @@ const Create = () => {
                 <select
                   className="form-input"
                   value={selectedClass}
-                  onChange={(e) => setSelectedClass(e.target.value)}
+                  onChange={handleInputChange(setSelectedClass)}
                   disabled={!classList.length}
                 >
-                  {/* Tùy chọn mặc định */}
                   <option value="">Select class name</option>
-                  {/* Lặp qua danh sách các lớp để tạo các tùy chọn */}
                   {classList.map((classItem) => (
                     <option key={classItem.value} value={classItem.value}>
                       {classItem.text}
