@@ -5,57 +5,63 @@ import { Link, useNavigate } from "react-router-dom";
 import ChangeValidation from "./ChangeValidation";
 import axios from "axios";
 import { useState } from "react";
-import {useNotification} from "../Noti/Noti"
+import { useNotification } from "../Noti/Noti";
 
-
-const ChangeAccount= () => {
+const ChangeAccount = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = ChangeValidation(values);
     setErrors(validationErrors);
-   
+
     if (Object.keys(validationErrors).length === 0) {
-        try {
-            // Gửi yêu cầu POST
-            const response= await axios.post("http://127.0.0.1:8000/account_change", values);
-               
-            if (response.data === 'Success') {
-                navigate("/"); // Chuyển hướng đến trang chủ
-            } else {
-                showNotification("No record","error");
-            }
-        } catch (err) {
-            // Xử lý lỗi
-            console.error("Đã xảy ra lỗi trong quá trình gửi yêu cầu POST hoặc xử lý phản hồi:");
-            console.error(err.response ? err.response.data : err.message);
-            
-            if (err.response && err.response.data) {
-                const errorData = err.response.data;
-                
-                for (const [key, value] of Object.entries(errorData)) {
-                    console.error(`${key}: ${value}`);
-                }
-            }
-            
-           
+      try {
+        // Gửi yêu cầu POST
+        const response = await axios.post(
+          "http://127.0.0.1:8000/account_change",
+          values
+        );
+
+        if (response.data === "Success") {
+          showNotification("Thay đổi thành công ","success");
+          navigate("/"); // Chuyển hướng đến trang chủ
+        } else {
+          showNotification("Không tồn tại tài khoản hoặc mật khẩu", "error");
         }
+      } catch (err) {
+        // Xử lý lỗi
+        showNotification(
+          err.response ? err.response.data : err.message,
+          "error"
+        );
+
+        if (err.response && err.response.data) {
+          const errorData = err.response.data;
+
+          for (const [key, value] of Object.entries(errorData)) {
+            showNotification(`${key}: ${value}`);
+          }
+        }
+      }
+    } else {
+      // Nếu có lỗi, in ra thông báo lỗi
+      for (const [key, value] of Object.entries(validationErrors)) {
+        showNotification(` ${value}`, "error");
+      }
     }
-    
   };
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const [values, setValues] = useState({
-    usernameTxt: '',
-    passwordTxt: '',
-    newpasswordTxt:'',
-    reenterpasswordTxt:'',
-  })
+    usernameTxt: "",
+    passwordTxt: "",
+    newpasswordTxt: "",
+    reenterpasswordTxt: "",
+  });
   const [errors, setErrors] = useState({});
   const handleInput = (e) => {
-    setValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
   return (
-
     <div className="wrapper">
       <form action="" onSubmit={handleSubmit}>
         <h1>Change Password</h1>
@@ -111,9 +117,8 @@ const ChangeAccount= () => {
             <span className="text-danger">{errors.passwordTxt}</span>
           )}
         </div>
-        
+
         <button type="submit">Save Change</button>
-        
       </form>
     </div>
   );
