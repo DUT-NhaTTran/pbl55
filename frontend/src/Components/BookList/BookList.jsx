@@ -170,7 +170,7 @@ export default function BookList() {
           />
           <BiSearch className="search-icon" />
         </div>
-        {/* <AdvancedSearch/> */}
+        <AdvancedSearch/>
         <div className="sort-column col-md-6">
           <select
             className="sort-dropdown"
