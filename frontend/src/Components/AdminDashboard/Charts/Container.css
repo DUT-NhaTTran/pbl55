@@ -1,0 +1,23 @@
+.main{
+    flex:1;
+    overflow:auto;
+}
+.content{
+    padding:2rem 1rem;
+    display:flex;
+    flex-direction: column;
+    gap:2rem;
+}
+.chart-container{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+    position: relative; /* Đặt vị trí tương đối để có thể sử dụng vị trí tuyệt đối cho biểu đồ */
+
+
+}
+@media (max-width: 1000px){
+    .chart-container{
+        flex-direction: column;
+    }
+}

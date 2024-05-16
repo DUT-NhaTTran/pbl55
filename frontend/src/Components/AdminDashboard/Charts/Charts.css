@@ -1,0 +1,39 @@
+/* .chart{
+    flex:2;
+    border-radius: 8px;
+    padding:20px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+} */
+/* .activity-chart{
+    flex:2;
+ 
+}
+.sales-chart{
+    flex:1;
+   
+} */
+.chart {
+    flex-basis: calc(65% - 20px); 
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+}
+.activity-chart {
+    max-width: calc(65% - 20px); /* 50% độ rộng của cha trừ đi các khoảng trống */
+}
+
+.sales-chart {
+    max-width: calc(35% - 20px); /* 50% độ rộng của cha trừ đi các khoảng trống */
+}
+
+@media (max-width: 800px) {
+    .chart {
+        flex-basis: calc(100% - 20px); /* Trên màn hình nhỏ hơn 800px, biểu đồ sẽ chiếm toàn bộ chiều rộng */
+        max-width: 100%; /* Trên màn hình nhỏ hơn 800px, không giới hạn độ rộng */
+    }
+}
+/* @media (max-width:800px){
+    .chart{
+        width:100%;
+    }
+} */

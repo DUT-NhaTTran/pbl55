@@ -24,6 +24,8 @@ urlpatterns = [
     path('account', views.account_view, name='account'),
     path('account_change',views.account_change_view,name='account_change'),
     path('user', views.user_list_view, name='user'),
+    path('user_manage', views.user_manage_view, name='user_manage'),
+    path('user_checking', views.user_checking_view, name='user_checking'),
     path('user/search', views.user_search_view, name='user/search'),
     path('user/delete', views.user_delete_view, name='user/delete'),
     path('get_fids', views.get_fid_view, name='get_fids'),
@@ -44,6 +46,14 @@ urlpatterns = [
     path('get_book_info', views.get_book_info, name='get_book_info'),
     path('edit_book', views.edit_book, name='edit_book'),
     path('search_books_dtb/', views.search_books_dtb, name='search_books_dtb'),
+    path('get_books_count', views.get_books_count, name='get_books_count'),
+    path('get_borrow_book_count', views.get_borrow_book_count, name='get_borrow_book_count'),
+    path('get_checkin_count', views.get_checkin_count, name='get_checkin_count'),
+    path('get_tags_and_counts', views.get_categories_and_counts, name='get_tags_and_counts'),
+    path('user_checking_data', views.user_checking_data, name='user_checking_data'),
+
+
+
 
 
 

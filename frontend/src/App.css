@@ -1,17 +1,50 @@
-.dashboard{
-  display:flex;
-  gap:20px;
+
+
+.dashboard {
+  display: grid;
+  grid-template-columns: auto 1fr; 
   background:#dde6ed;
-  padding:20px;
+  padding:5px;
 }
-.dashboard--content {
-  background:#fff;
+
+.header_app{
+  grid-row: 1 / 2; 
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-end; /* Căn phần tử con theo chiều dọc */
+  justify-content: flex-end; /* Căn phần tử theo chiều ngang */
+  background: #dde6ed;
+  margin-right:10px;
+
+
+}
+
+.header__user {
+  margin-right: 20px;
+  font-size: 15px; 
+
+}
+
+
+.sidebar {
+  grid-row: 2 / 3; 
+  grid-column: 1 / 2; 
+  
+}
+
+.outlet {
   flex:1;
   border-radius: 20px;
   padding: 2rem;
   display: flex;
   gap: 1.5rem;
   justify-content: space-between;
-  margin: 20px 20px 20px 0;
+  margin: 10px 25px 10px 20px;
+  background:#fff;
 
+}
+.icon-1 {
+  color: red;
+  font-size: 24px;
+  margin-top:20px;
 }

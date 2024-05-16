@@ -82,13 +82,16 @@ def user_list_view(request):
                 users.birth,
                 classes.class_name,
                 ci.time_in,
-                ci.time_out
+                ci.time_out,
+                f.faculty_name
             FROM
                 Users AS users
             JOIN
                 Classes AS classes ON users.cid = classes.cid
             JOIN
                 CheckIn AS ci ON users.uid = ci.uid
+            JOIN
+                Faculties AS f ON f.fid= classes.fid
             WHERE
                 users.isAdmin = 0;
             """
@@ -109,6 +112,7 @@ def user_list_view(request):
                     'class_name': row[6],
                     'time_in': row[7],
                     'time_out': row[8],
+                    'faculty_name':row[9]
                 })
 
             # Trả về phản hồi JSON chứa dữ liệu
@@ -118,6 +122,118 @@ def user_list_view(request):
             print("Error executing query:", e)
             return JsonResponse({'error': 'Error executing query'}, status=500)
     
+    return HttpResponseBadRequest("Method not allowed")
+@csrf_exempt
+
+def user_manage_view(request):
+    # Kiểm tra nếu phương thức yêu cầu là GET
+    if request.method == 'GET':
+        try:
+            # Truy vấn SQL để lấy dữ liệu từ cơ sở dữ liệu
+            sql = """
+            SELECT
+                users.uid,
+                users.name,
+                users.email,
+                users.id,
+                users.gender,
+                users.birth,
+                classes.class_name,
+                
+                f.faculty_name
+            FROM
+                Users AS users
+            JOIN
+                Classes AS classes ON users.cid = classes.cid
+           
+            JOIN
+                Faculties AS f ON f.fid= classes.fid
+            WHERE
+                users.isAdmin = 0;
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+
+            results = []
+            for row in data:
+                results.append({
+                    'uid': row[0],
+                    'name': row[1],
+                    'email': row[2],
+                    'id': row[3],
+                    'gender': row[4],
+                    'birth': row[5],
+                    'class_name': row[6],
+                    'faculty_name':row[7]
+                })
+
+            # Trả về phản hồi JSON chứa dữ liệu
+            return JsonResponse(results, safe=False)
+
+        except Exception as e:
+            print("Error executing query:", e)
+            return JsonResponse({'error': 'Error executing query'}, status=500)
+    
+    return HttpResponseBadRequest("Method not allowed")
+@csrf_exempt
+
+
+def user_checking_view(request):
+    if request.method == 'GET':
+        try:
+            sql = """
+                SELECT
+                    users.uid,
+                    users.name,
+                    users.email,
+                    users.id,
+                    users.gender,
+                    users.birth,
+                    classes.class_name,
+                    c.day_borrow,
+                    c.limit_day,
+                    f.faculty_name
+                FROM
+                    Users AS users
+                JOIN
+                    Classes AS classes ON users.cid = classes.cid
+                JOIN 
+                    Cards AS c ON c.sid = users.uid
+                JOIN
+                    Faculties AS f ON f.fid= classes.fid
+                WHERE
+                    users.isAdmin = 0
+                    AND (c.day_return IS NULL OR DATE_ADD(c.day_borrow, INTERVAL c.limit_day DAY) < c.day_return);
+            """
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+
+            results = []
+            for row in data:
+                results.append({
+                    'uid': row[0],
+                    'name': row[1],
+                    'email': row[2],
+                    'id': row[3],
+                    'gender': row[4],
+                    'birth': row[5],
+                    'class_name': row[6],
+                    'day_borrow':row[7],
+                    'limit_day':row[8],
+                    'faculty_name': row[9]
+                })
+
+            row_count = len(results)
+
+            return JsonResponse({'results': results, 'row_count': row_count}, safe=False)
+
+        except Exception as e:
+            error_message = "Error executing query: {}".format(e)
+            return JsonResponse({'error': error_message}, status=500)
+
     return HttpResponseBadRequest("Method not allowed")
 
 @csrf_exempt
@@ -977,7 +1093,6 @@ def get_book_info(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 @csrf_exempt
 def edit_book(request):
-    print('edit book nè')
     if request.method == 'POST':
         try:
             
@@ -1082,5 +1197,188 @@ def search_books_dtb(request):
         except Exception as e:
             print(f"Error processing request: {e}")
             return JsonResponse({'error': 'Error processing request'}, status=500)
+
+    return HttpResponseBadRequest("Method not allowed")
+
+def get_books_count(request):
+    if request.method == 'GET':
+        try:
+            # Nhận tham số date từ yêu cầu GET
+            date = request.GET.get('date', None)
+
+            # Tạo điều kiện cho ngày nếu có
+            date_condition = f"AND enter_book < '{date}'" if date else ""
+
+            # Truy vấn SQL để lấy số lượng bản ghi và tổng số lượng
+            sql = f"""
+                SELECT COUNT(*) as total_books, SUM(quantity) as total_quantity 
+                FROM Books
+                WHERE 1=1 {date_condition}
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+                result = cursor.fetchone()
+
+            # Trả về số lượng sách và tổng số lượng trong JSON response
+            return JsonResponse({
+                'total_books': result[0], 
+                'total_quantity': result[1] if result[1] is not None else 0
+            })
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return JsonResponse({'error': 'Error executing query'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def get_checkin_count(request):
+    if request.method == 'GET':
+        try:
+            # Nhận tham số date từ yêu cầu GET
+            selected_date = request.GET.get('date', None)
+
+            # Tạo điều kiện cho ngày nếu có
+            condition = f"WHERE time_out < '{selected_date}'" if selected_date else ""
+
+            # Truy vấn SQL để đếm số lượng bản ghi
+            sql_count = f"""
+                SELECT COUNT(*)
+                FROM CheckIn
+                {condition}
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql_count)
+                count = cursor.fetchone()[0]
+
+            # Trả về số lượng check-in trong JSON response
+            return JsonResponse({'total_checkin': count}, safe=False)
+
+        except Exception as e:
+            error_message = f"Error executing query: {e}"
+            return JsonResponse({'error': error_message}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def get_borrow_book_count(request):
+    if request.method == 'GET':
+        try:
+            # Nhận tham số date từ yêu cầu GET
+            selected_date = request.GET.get('date', None)
+
+            # Tạo điều kiện cho ngày nếu có
+            condition = f"WHERE day_borrow < '{selected_date}'" if selected_date else ""
+
+            # Truy vấn SQL để đếm số lượng bản ghi
+            sql_count = f"""
+                SELECT COUNT(*)
+                FROM Cards
+                {condition}
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql_count)
+                count = cursor.fetchone()[0]
+
+            # Trả về số lượng sách mượn trong JSON response
+            return JsonResponse({'total_borrow_book': count}, safe=False)
+
+        except Exception as e:
+            error_message = f"Error executing query: {e}"
+            return JsonResponse({'error': error_message}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def get_categories_and_counts(request):
+    if request.method == 'GET':
+        try:
+            date = request.GET.get('date', None)
+            print(date)
+
+            condition = f"AND enter_book < '{date}'" if date else ""
+
+            # Truy vấn SQL để lấy danh sách các tag và số lượng sách của mỗi tag
+            sql = f"""
+                SELECT tag, COUNT(*) AS count
+                FROM Books
+                WHERE 1=1 {condition}
+                GROUP BY tag
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+
+                categories = [{'tag': row[0], 'count': row[1]} for row in data]
+
+            return JsonResponse({'categories': categories}, safe=False)
+
+        except Exception as e:
+            print("Error executing query:", e)
+            return JsonResponse({'error': 'Error executing query'}, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+def user_checking_data(request):
+    print("Hello ")
+    if request.method == 'GET':
+        try:
+            selected_date = request.GET.get('date', None)
+            print(selected_date)
+            condition = f"AND c.day_borrow < '{selected_date}'" if selected_date else ""
+
+            sql = f"""
+                SELECT
+                    users.uid,
+                    users.name,
+                    users.email,
+                    users.id,
+                    users.gender,
+                    users.birth,
+                    classes.class_name,
+                    c.day_borrow,
+                    c.limit_day,
+                    f.faculty_name
+                FROM
+                    Users AS users
+                JOIN
+                    Classes AS classes ON users.cid = classes.cid
+                JOIN 
+                    Cards AS c ON c.sid = users.uid
+                JOIN
+                    Faculties AS f ON f.fid= classes.fid
+                WHERE
+                    users.isAdmin = 0
+                    AND (c.day_return IS NULL OR DATE_ADD(c.day_borrow, INTERVAL c.limit_day DAY) < c.day_return)
+                    {condition};
+            """
+
+            with connections['default'].cursor() as cursor:
+                cursor.execute(sql)
+                data = cursor.fetchall()
+
+            results = []
+            for row in data:
+                results.append({
+                    'uid': row[0],
+                    'name': row[1],
+                    'email': row[2],
+                    'id': row[3],
+                    'gender': row[4],
+                    'birth': row[5],
+                    'class_name': row[6],
+                    'day_borrow': row[7],
+                    'limit_day': row[8],
+                    'faculty_name': row[9]
+                })
+
+            row_count = len(results)
+
+            return JsonResponse({'results': results, 'row_count': row_count}, safe=False)
+
+        except Exception as e:
+            error_message = "Error executing query: {}".format(e)
+            return JsonResponse({'error': error_message}, status=500)
 
     return HttpResponseBadRequest("Method not allowed")

@@ -146,9 +146,9 @@ const StudentList = () => {
     <div className="student-list-container">
         <div className={selectedRecord ? 'datatable-container-70' : 'datatable-container-100'}>
             <ContentHeader handleSearch={handleSearch} />
-            <button className="delete-selected-btn" onClick={handleDeleteSelected}>
+            {/* <button className="delete-selected-btn" onClick={handleDeleteSelected}>
                 Delete Selected
-            </button>
+            </button> */}
 
             <DataTable
                 columns={columns}

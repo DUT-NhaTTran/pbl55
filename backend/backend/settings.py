@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'pbl5',
         'USER':'root',
         'PASSWORD':'',
-        'HOST':'127.0.0.1',
+        'HOST':'0.0.0.0',
         'PORT':'3306',
     }
 }
@@ -129,7 +129,21 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-CORS_ALLOW_CREDENTIALS = False  # Cho phép gửi cookie và thông tin đăng nhập
+CORS_ALLOW_CREDENTIALS = True  # Cho phép gửi cookie và thông tin đăng nhập
+CORS_ORIGIN_ALLOW_ALL = True  # Cho phép truy cập từ tất cả các origin
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]  # Các headers được phép trong yêu cầu CORS
+ALLOWED_HOSTS = ['*']
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_WHITELIST = [

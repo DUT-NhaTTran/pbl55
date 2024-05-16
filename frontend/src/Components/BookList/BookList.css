@@ -6,7 +6,7 @@
     max-width: 100%; 
     /*phan chinh can giua*/
     /* justify-content: center; */
-
+    width: 700px;
     /* gap:20px; */
 }
 .booklist-page {
@@ -136,13 +136,13 @@
     margin-bottom: 20px; /* Khoảng cách dưới để tách khỏi phần khác */
     
   }
-.book-actions {
+.book-actions-1 {
     display: flex; /* Sử dụng flexbox */
     justify-content: flex-end; /* Căn chỉnh các nút về phía bên phải */
     padding: 10px; /* Khoảng cách bên trong */
 }
 
-.book-actions button {
+.book-actions-1 button {
     margin-left: 10px; /* Khoảng cách giữa các nút */
     padding: 8px 12px; /* Khoảng cách bên trong nút */
     border: none; /* Bỏ viền mặc định */
@@ -152,7 +152,7 @@
     cursor: pointer; /* Con trỏ chuột thay đổi khi di chuột qua */
 }
 
-.book-actions button:hover {
+.book-actions-1 button:hover {
     background-color: #0056b3; /* Màu nền thay đổi khi di chuột qua */
 }
 

@@ -16,6 +16,12 @@ import ChangeAccount from "./Components/LoginForm/ChangeAccount";
 import User from "./Components/User/User";
 import { NotificationProvider } from "./Components/Noti/Noti";
 import EditStudentProfile from "./Components/EditProfile/EditStudentProfile";
+import StudentMagagement from "./Components/StudentList/StudentManagement";
+import StudentChecking from "./Components/StudentList/StudentChecking";
+import AdminDashboard from "./Components/AdminDashboard/AdminDashboard";
+import { getAuthInfo,clearAuthInfo } from "./Components/LoginForm/auth";
+import { BiHome, BiBookAlt, BiSolidReport, BiTask,BiExit } from "react-icons/bi";
+import { Link, useNavigate } from "react-router-dom";
 ReactModal.setAppElement("#root");
 
 function App() {
@@ -37,21 +43,41 @@ function App() {
             <Route path="editbook" element={<EditBook />} />
             <Route path="user" element={<User />} />
             <Route path="editstudentprofile" element={<EditStudentProfile />} />
+            <Route path="studentmanagement" element={<StudentMagagement/>} />
+            <Route path="studentchecking" element={<StudentChecking/>} />
+            <Route path="admindashboard" element={<AdminDashboard/>} />       
           </Route>
         </Routes>
       </BrowserRouter>
     </NotificationProvider>
   );
 }
+
+const handleLogout = () => {
+  
+    clearAuthInfo();
+   
+  };
 function Home() {
+  const { username } = getAuthInfo(); // Lấy username từ thông tin người dùng
+
   return (
     <div className="dashboard">
-      <SideBar />
-      <div className="dashboard--content">
+      <div className="header_app">
+        <div className="header__user">Xin chào,{ username}</div>
+        <Link to="/" className="item" onClick={handleLogout}> {/* Dẫn link đến trang logout */}
+          <BiExit className="icon-1" />
+        </Link>
+      </div>
+      <div className="sidebar">
+        <SideBar />
+      </div>
+      <div className="outlet">
         <Outlet />
       </div>
     </div>
   );
 }
+
 
 export default App;
