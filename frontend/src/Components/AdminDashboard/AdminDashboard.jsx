@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CardList from "./Cards/CardList";
-import ActivityChart from "./Charts/ActivityChart";
-import SalesChart from "./Charts/SalesChart";
+import ColumnChart from "./Charts/ColumnChart";
+import PieChart from "./Charts/PieChart";
 import ChartContainer from "./Charts/ChartContainer";
 import { IoCalendar } from "react-icons/io5"; // Import icon
 import "./AdminDashboard.css";
@@ -41,8 +41,8 @@ const AdminDashboard = () => {
       )}
       <CardList selectedDate={selectedDate}/>
       <ChartContainer>
-        <ActivityChart selectedDate={selectedDate} />
-        <SalesChart selectedDate={selectedDate} />
+        <ColumnChart selectedDate={selectedDate} />
+        <PieChart selectedDate={selectedDate} />
       </ChartContainer>
     </div>
   );

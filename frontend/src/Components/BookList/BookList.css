@@ -79,31 +79,33 @@
     color: #666; 
 
 }
-.control-bar {
+/* .control-bar {
     display: flex;
     margin-bottom: 20px;
-  }
-  
+  } */
+.control-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
 .search-box{
     background: #dde6dd;
-    padding: 8px 80px;
     border-radius: 10px;
-    display:flex;
+    display:flex-end;
     align-items: center;
     margin-top:20px;
-    margin-left:30px;
-    
+    margin-right:10px;
+    max-width: 100%;
     
 }
-.search-box input{
-    border:none;
-    outline:none;
-    background:transparent;
-    padding:5px;
-    outline:none;
+.search-box input {
+    width: 100%;
+    border-radius: 5px;
 }
 .search-box .icon{
-    color:#969393;
+color:#969393;
    font-size:22px;
    cursor:pointer;
 }
@@ -128,14 +130,24 @@
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Bóng đổ nhẹ */
   }
   .search-box-container {
-    display: flex; /* Đặt flexbox để tạo hai cột */
-    margin-bottom: 20px; /* Khoảng cách dưới để tách khỏi phần khác */
-    
-  }
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+.search-sort-container {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 150px;
+}
+
 .book-actions-1 {
     display: flex; /* Sử dụng flexbox */
     justify-content: flex-end; /* Căn chỉnh các nút về phía bên phải */
     padding: 10px; /* Khoảng cách bên trong */
+    margin-left:25px;
+    margin-top:20px;
 }
 
 .book-actions-1 button {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Chart from 'react-apexcharts';
 import axios from "axios";
 
-const SalesChart = ({ selectedDate }) => {
+const PieChart = ({ selectedDate }) => {
   
   const [checkinCount, setCheckinCount] = useState(0);
   const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
@@ -72,4 +72,4 @@ const SalesChart = ({ selectedDate }) => {
   );
 };
 
-export default SalesChart;
+export default PieChart;

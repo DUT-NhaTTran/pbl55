@@ -2,6 +2,8 @@
     display: flex;
     gap:20px;
     flex-wrap: wrap;
+    margin-top:30px;
+    margin-bottom: 30px;
 }
 .card{
     flex:1;
@@ -12,6 +14,7 @@
     flex-direction: column;
     gap:20px;
     width:400px;
+    
 }
 .card--icon{
     background: #fff;

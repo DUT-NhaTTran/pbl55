@@ -3,7 +3,7 @@ import ReactApexChart from 'react-apexcharts';
 import axios from "axios";
 import "./Charts.css";
 
-const ActivityChart = ({selectedDate}) => {
+const ColumnChart = ({selectedDate}) => {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
@@ -127,4 +127,4 @@ const ActivityChart = ({selectedDate}) => {
   );
 };
 
-export default ActivityChart;
+export default ColumnChart

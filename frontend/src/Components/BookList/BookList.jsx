@@ -154,32 +154,18 @@ export default function BookList() {
 
   return (
     <div className="booklist-page">
-      {/* Thành phần Tags */}
-
       <Tags onTagSelect={fetchBooksByTag} />
 
-      <div className="booklist-page-container">
-        {role == 1 && (
-          <div className="book-actions-1">
-            <button onClick={handleAddBook}>Thêm sách</button>
-            <button onClick={() => deleteBooks()}>Xóa sách</button>
-          </div>
-        )}
-      </div>
-
-      <div className="search-sort-container row">
-        <div className="search-box col-md-6">
-          <input
-            type="text"
-            placeholder="Tìm kiếm sách ..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="search-input"
-          />
-          <BiSearch className="search-icon" />
+      <div className="search-sort-container">
+        <div className="booklist-page-container">
+          {role == 1 && (
+            <div className="book-actions-1">
+              <button onClick={handleAddBook}>Thêm sách</button>
+              <button onClick={() => deleteBooks()}>Xóa sách</button>
+            </div>
+          )}
         </div>
-        {/* <AdvancedSearch/> */}
-        <div className="sort-column col-md-6">
+        <div className="sort-column">
           <select
             className="sort-dropdown"
             value={SortOption}
@@ -191,6 +177,16 @@ export default function BookList() {
             <option value="quantity-asc">Số lượng (Tăng dần)</option>
             <option value="quantity-desc">Số lượng (Giảm dần)</option>
           </select>
+        </div>
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="Tìm kiếm sách ..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          <BiSearch className="search-icon" />
         </div>
       </div>
       <section className="card-container">
