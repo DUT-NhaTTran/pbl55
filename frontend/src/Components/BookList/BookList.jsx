@@ -159,8 +159,7 @@ export default function BookList() {
       <Tags onTagSelect={fetchBooksByTag} />
 
       <div className="booklist-page-container">
-        {role == 1 && 
-        (
+        {role == 1 && (
           <div className="book-actions-1">
             <button onClick={handleAddBook}>Thêm sách</button>
             <button onClick={() => deleteBooks()}>Xóa sách</button>
@@ -196,7 +195,7 @@ export default function BookList() {
       </div>
       <section className="card-container">
         {books.map((book, index) => (
-          <section key={index} className="card">
+          <section key={index} className="book-card">
             <img
               src={`data:image/png;base64,${book.book_image}`}
               className="card-img"
@@ -215,12 +214,14 @@ export default function BookList() {
                 <span className="quantity-value">{book.quantity}</span>
               </div>
             </div>
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={selectedBooks.includes(book)}
-              onChange={() => handleBookCheckboxChange(book)}
-            />
+            <div className="checkbox-container">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={selectedBooks.includes(book.id)}
+                onChange={() => handleBookCheckboxChange(book.id)}
+              />
+            </div>
           </section>
         ))}
       </section>

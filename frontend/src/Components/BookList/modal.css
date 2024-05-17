@@ -23,10 +23,9 @@
   max-height: 70vh;
   overflow: auto;
 }
-
 .modal-image {
-  max-width: 100%; 
-  height: auto; 
+  max-width: 250px; 
+  height: 250px; 
   object-fit: contain; 
 }
 
