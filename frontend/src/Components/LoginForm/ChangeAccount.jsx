@@ -21,11 +21,12 @@ const ChangeAccount = () => {
           values
         );
 
-        if (response.data === "Success") {
-          showNotification("Thay đổi thành công ","success");
+        if (response.data.message === "Success") {
+          showNotification("Successfully changed","success");
           navigate("/"); // Chuyển hướng đến trang chủ
         } else {
-          showNotification("Không tồn tại tài khoản hoặc mật khẩu", "error");
+          showNotification("Account or password does not exist"
+          , "error");
         }
       } catch (err) {
         // Xử lý lỗi

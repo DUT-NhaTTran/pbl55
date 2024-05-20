@@ -21,9 +21,7 @@ class Accounts(models.Model):
 class Avatars(models.Model):
     avatar_id = models.AutoField(primary_key=True)
     uid = models.ForeignKey('Users', models.DO_NOTHING, db_column='uid', blank=True, null=True)
-    # image = models.TextField()
-    image = models.BinaryField(null=True, blank=True)  # Trường lưu dữ liệu ảnh dưới dạng binary blob
-
+    image = models.TextField()
 
     class Meta:
         managed = False
@@ -33,8 +31,7 @@ class Avatars(models.Model):
 class Bookimages(models.Model):
     biid = models.AutoField(primary_key=True)
     bid = models.ForeignKey('Books', models.DO_NOTHING, db_column='bid', blank=True, null=True)
-    book_image = models.BinaryField(null=True, blank=True)  # Trường lưu dữ liệu ảnh dưới dạng binary blob
-
+    book_image = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -50,7 +47,6 @@ class Books(models.Model):
     description = models.TextField(blank=True, null=True)
     enter_book = models.DateTimeField(blank=True, null=True)
 
-
     class Meta:
         managed = False
         db_table = 'Books'
@@ -59,9 +55,9 @@ class Books(models.Model):
 class Cards(models.Model):
     ca_id = models.IntegerField(primary_key=True)
     sid = models.ForeignKey('Users', models.DO_NOTHING, db_column='sid', blank=True, null=True)
-    bid = models.ForeignKey('Books', models.DO_NOTHING, db_column='bid', blank=True, null=True)
-    day_borrow = models.DateTimeField(blank=True, null=True)
-    day_return = models.DateTimeField(blank=True, null=True)
+    bid = models.ForeignKey(Books, models.DO_NOTHING, db_column='bid', blank=True, null=True)
+    day_borrow = models.DateField(blank=True, null=True)
+    day_return = models.DateField(blank=True, null=True)
     limit_day = models.IntegerField(blank=True, null=True)
 
     class Meta:

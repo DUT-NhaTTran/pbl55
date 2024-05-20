@@ -18,9 +18,10 @@ export default function BookList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [SortOption, setSortOption] = useState("");
-  const { showNotification } = useNotification();
+
   const { role } = getAuthInfo();
-  console.log("Role", role);
+  const { showNotification } = useNotification();
+
   // Hàm để lấy sách theo tag hoặc tất cả sách
   const fetchBooksByTag = async (tag) => {
     try {
@@ -101,7 +102,6 @@ export default function BookList() {
     setSelectedBook(null);
   };
 
-  // Hàm để xử lý tick chọn sách
   const handleBookCheckboxChange = (book) => {
     if (selectedBooks.includes(book)) {
       // Nếu sách đã được chọn, bỏ chọn
@@ -111,6 +111,7 @@ export default function BookList() {
       setSelectedBooks([...selectedBooks, book]);
     }
   };
+
   const navigate = useNavigate();
 
   const handleAddBook = () => {
@@ -126,19 +127,21 @@ export default function BookList() {
   // Hàm xóa sách (ví dụ)
   const deleteBooks = async () => {
     if (selectedBooks.length === 0) {
-      showNotification("No books selected for deletion.", "error");
+      console.log("No books selected for deletion.");
+
       return;
     }
+    console.log(selectedBooks); // Print selectedBooks to console
+    const bookIds = selectedBooks.map((book) => book.id); // Retrieve book IDs
 
     try {
-      const bookIds = selectedBooks.map((book) => book.id);
       const response = await axios.post("http://127.0.0.1:8000/delete_books", {
         ids: bookIds,
       });
 
       if (response.data.success) {
         showNotification("Books deleted successfully.", "success");
-        fetchAllBooks(); // Cập nhật lại danh sách sách
+        fetchAllBooks(); // Update the book list
         setSelectedBooks([]);
       } else {
         showNotification(
@@ -211,11 +214,12 @@ export default function BookList() {
               </div>
             </div>
             <div className="checkbox-container">
+              
               <input
                 type="checkbox"
                 className="checkbox"
-                checked={selectedBooks.includes(book.id)}
-                onChange={() => handleBookCheckboxChange(book.id)}
+                checked={selectedBooks.includes(book)}
+                onChange={() => handleBookCheckboxChange(book)}
               />
             </div>
           </section>
@@ -261,6 +265,10 @@ export default function BookList() {
               <div className="book-quantity">
                 <span className="author-label">Mô tả: </span>
                 <span className="author-value">{selectedBook.description}</span>
+              </div>
+              <div className="book-quantity">
+                <span className="author-label">Enter_book: </span>
+                <span className="author-value">{selectedBook.enter_book}</span>
               </div>
               <div className="modal-footer">
                 <button

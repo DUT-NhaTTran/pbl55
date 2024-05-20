@@ -6,24 +6,34 @@ import ChartContainer from "./Charts/ChartContainer";
 import { IoCalendar } from "react-icons/io5"; // Import icon
 import "./AdminDashboard.css";
 
+const toVietnamISOString = (date) => {
+  const tzOffset = 7 * 60 * 60 * 1000; 
+  const vietnamTime = new Date(date.getTime() + tzOffset);
+  return vietnamTime.toISOString().slice(0, -1); // Remove the 'Z' at the end
+};
+
 const AdminDashboard = () => {
+  const timeZone = "Asia/Ho_Chi_Minh"; // Vietnam timezone
+  const today = new Date().toLocaleDateString('en-CA', { timeZone }); // Format as YYYY-MM-DD in Vietnam time
   const [showCalendar, setShowCalendar] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(""); 
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedDateTime, setSelectedDateTime] = useState(toVietnamISOString(new Date())); 
 
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
   };
 
   const handleDateChange = (event) => {
-    setSelectedDate(event.target.value); // Cập nhật ngày được chọn
+    const dateValue = event.target.value;
+    setSelectedDate(dateValue); // Update displayed date
+    const [hours, minutes, seconds] = new Date(selectedDateTime).toLocaleTimeString('en-GB', { timeZone, hour12: false }).split(':');
+    const newDateTime = new Date(`${dateValue}T${hours}:${minutes}:${seconds}+07:00`).toISOString();
+    setSelectedDateTime(newDateTime);
   };
 
   useEffect(() => {
-   console.log(selectedDate);
-  }, [selectedDate]); 
-
-  // Lấy ngày hiện tại dưới dạng chuỗi YYYY-MM-DD
-  const today = new Date().toISOString().split('T')[0];
+    console.log("in",selectedDateTime); // Log full datetime
+  }, [selectedDateTime]);
 
   return (
     <div>
@@ -36,13 +46,13 @@ const AdminDashboard = () => {
           className="custom-calendar"
           value={selectedDate}
           onChange={handleDateChange}
-          max={today} 
+          max={today}
         />
       )}
-      <CardList selectedDate={selectedDate}/>
+      <CardList selectedDateTime={selectedDateTime} />
       <ChartContainer>
-        <ColumnChart selectedDate={selectedDate} />
-        <PieChart selectedDate={selectedDate} />
+        <ColumnChart selectedDateTime={selectedDateTime} />
+        <PieChart selectedDateTime={selectedDateTime} />
       </ChartContainer>
     </div>
   );

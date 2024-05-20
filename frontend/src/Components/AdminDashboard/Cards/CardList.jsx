@@ -4,7 +4,8 @@ import axios from "axios";
 import Cards from "./Cards";
 import { IoBook, IoBookSharp, IoCart, IoCash, IoPeople } from "react-icons/io5";
 
-const CardList = ({selectedDate}) => {
+const CardList = ({selectedDateTime}) => {
+ 
   const [booksCount, setBooksCount] = useState(null);
   const [totalBooksCount,setTotalBooksCount]=useState(null);
   const [checkinCount, setCheckinCount] = useState(null);
@@ -16,11 +17,13 @@ const formattedDate = currentDate.toISOString(); // Chuyển đổi thời gian 
   const [currentCheckinCount, setCurrentCheckinCount] = useState(null);
   const [currentBorrowedBooksCount, setCurrentBorrowedBooksCount] = useState(null);
   useEffect(() => {
+   
     const getBooksCount = async () => {
       try {
         const response = await axios.get("http://127.0.0.1:8000/get_books_count",{
           params:{
-            date:selectedDate,
+            date:selectedDateTime,
+           
           }
         }
         );
@@ -35,7 +38,7 @@ const formattedDate = currentDate.toISOString(); // Chuyển đổi thời gian 
       try {
         const response = await axios.get("http://127.0.0.1:8000/get_checkin_count",{
           params:{
-            date: selectedDate,
+            date: selectedDateTime,
           }
         });
         setCheckinCount(response.data.total_checkin);
@@ -48,7 +51,7 @@ const formattedDate = currentDate.toISOString(); // Chuyển đổi thời gian 
       try {
         const response = await axios.get("http://127.0.0.1:8000/get_borrow_book_count",{
           params:{
-            date:selectedDate
+            date:selectedDateTime
           }
         });
         setBorrowedBooksCount(response.data.total_borrow_book);
@@ -86,7 +89,7 @@ const formattedDate = currentDate.toISOString(); // Chuyển đổi thời gian 
     getBooksCount();
     getCheckinCount();
     getBorrowedBooksCount();
-  }, [selectedDate]);
+  }, [selectedDateTime]);
   const calculateGrowth = (currentValue, selectedValue) => {
     if (currentValue !== null && selectedValue !== null) {
         const growth = ((selectedValue - currentValue) / currentValue) * 100;

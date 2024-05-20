@@ -3,7 +3,7 @@ import ReactApexChart from 'react-apexcharts';
 import axios from "axios";
 import "./Charts.css";
 
-const ColumnChart = ({selectedDate}) => {
+const ColumnChart = ({selectedDateTime}) => {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ const ColumnChart = ({selectedDate}) => {
       try {
         const response = await axios.get("http://127.0.0.1:8000/get_tags_and_counts", {
           params: {
-            date: selectedDate
+            date: selectedDateTime
           }
         });
         setChartData(response.data.categories);
@@ -21,7 +21,7 @@ const ColumnChart = ({selectedDate}) => {
     };
   
     fetchData();
-  }, [selectedDate]); // Thêm selectedDate vào danh sách dependency
+  }, [selectedDateTime]); // Thêm selectedDateTime vào danh sách dependency
   
 
   const totalBooks = chartData.reduce((acc, item) => acc + item.count, 0);

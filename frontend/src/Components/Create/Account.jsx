@@ -41,7 +41,6 @@ const Account = () => {
         "http://127.0.0.1:8000/save_account",
         data
       );
-      console.log("Account saved successfully:", response.data);
       showNotification("Account created successfully", "success");
       localStorage.removeItem("uid");
       localStorage.removeItem("name");

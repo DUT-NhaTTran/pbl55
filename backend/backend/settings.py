@@ -87,6 +87,7 @@ DATABASES = {
         'PASSWORD':'',
         'HOST':'0.0.0.0',
         'PORT':'3306',
+       
     }
 }
 
@@ -115,10 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh' # Sử dụng múi giờ của Việt Nam
 
 USE_I18N = True
-
 USE_TZ = True
 
 

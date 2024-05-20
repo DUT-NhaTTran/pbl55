@@ -11,20 +11,16 @@ const CreateBook = () => {
   const [author, setAuthor] = useState("");
   const [tag, setTag] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
-  const {showNotification}=useNotification();
   const [description, setDescription] = useState("");
   const [bookImage, setBookImage] = useState(null);
   const [bookImagePreviewUrl, setBookImagePreviewUrl] = useState("");
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
-
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/get_tags"
-        );
+        const response = await axios.get("http://127.0.0.1:8000/get_tags");
         setTag(response.data.tags);
-        console.log('tag nè ',tag);
       } catch (error) {
         console.error("Error fetching tags:", error);
       }
@@ -67,9 +63,20 @@ const CreateBook = () => {
   const handleSave = async (e) => {
     e.preventDefault(); // Ngăn chặn form submit mặc định
 
-    if (!id || !bookName || !quantity || !author || !selectedTag || !description || !bookImage) {
-        showNotification("Please fill out all fields, including book image.", "error");
-        return;
+    if (
+      !id ||
+      !bookName ||
+      !quantity ||
+      !author ||
+      !selectedTag ||
+      !description ||
+      !bookImage
+    ) {
+      showNotification(
+        "Please fill out all fields, including book image.",
+        "error"
+      );
+      return;
     }
 
     // Tiếp tục với việc chuẩn bị formData
@@ -87,16 +94,17 @@ const CreateBook = () => {
     formData.append("book_image", bookImage);
 
     try {
-        // Gọi API và gửi formData
-        const response = await axios.post("http://127.0.0.1:8000/save_book", formData);
-        console.log("Book saved successfully:", response.data);
-        showNotification("Book saved successfully.", "success");
-        navigate("/home/booklist");
+      // Gọi API và gửi formData
+      const response = await axios.post(
+        "http://127.0.0.1:8000/save_book",
+        formData
+      );
+      showNotification("Book saved successfully.", "success");
+      navigate("/home/booklist");
     } catch (error) {
-        console.error("Error saving book data:", error);
-        showNotification("Error saving book data.", "error");
+      showNotification("Error saving book data.", "error");
     }
-};
+  };
 
   return (
     <div className="full-width">
@@ -155,9 +163,23 @@ const CreateBook = () => {
                   type="number"
                   className="form-input"
                   value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (
+                      value === "" ||
+                      (Number(value) > 0 && Number.isInteger(Number(value)))
+                    ) {
+                      setQuantity(value);
+                    } else {
+                      showNotification(
+                        "Chỉ được nhập số nguyên dương",
+                        "error"
+                      );
+                    }
+                  }}
                 />
               </div>
+
               <div className="form-group">
                 <label className="form-label">Author</label>
                 <input
@@ -171,9 +193,9 @@ const CreateBook = () => {
             {/* Cột 2 */}
             <div className="col-md-6">
               <div className="form-group">
-              <label className="form-label">Tags</label>
+                <label className="form-label">Tags</label>
 
-              <select
+                <select
                   className="form-input"
                   value={selectedTag}
                   onChange={(e) => setSelectedTag(e.target.value)}

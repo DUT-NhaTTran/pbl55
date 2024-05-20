@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useNotification } from "../Noti/Noti";
 import "../Create/Create.css";
-
-const defaultUserImage = "https://bootdey.com/img/Content/avatar/avatar1.png"; // Đường dẫn đến ảnh mặc định
-
+const defaultUserImage = "https://bootdey.com/img/Content/avatar/avatar1.png"; 
 const EditProfile = () => {
   // Lấy uid từ state của useLocation
   const location = useLocation();
@@ -24,7 +23,7 @@ const EditProfile = () => {
   const [avatarFile, setAvatarFile] = useState(null);
   const [fidList, setFidList] = useState([]);
   const [classList, setClassList] = useState([]);
-
+  const {showNotification}=useNotification();
   const navigate = useNavigate();
   const handleReset = () => {
     // Đặt lại tất cả trạng thái về giá trị ban đầu
@@ -114,11 +113,11 @@ const EditProfile = () => {
     axios
       .post("http://127.0.0.1:8000/edit_user_view", formData)
       .then((response) => {
-        console.log("User Edited successfully:", response.data);
+        showNotification("User Edited successfully:", "success");
         navigate("/home/content");
       })
       .catch((error) => {
-        console.error("Error saving user data:", error);
+        showNotification("Error saving user data:", "errorr");
       });
   };
 

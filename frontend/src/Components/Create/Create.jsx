@@ -87,7 +87,7 @@ const Create = () => {
         localStorage.setItem("avatarImage", avatarPreviewUrl);
         navigate("/home/account");
     } catch (error) {
-        showNotification("ID sinh viên đã tồn tại", "error");
+        showNotification("UID already exist", "error");
     }
   }, [
     uid, name, email, id, birthDate, gender, selectedFid, selectedClass, avatarFile, showNotification, navigate

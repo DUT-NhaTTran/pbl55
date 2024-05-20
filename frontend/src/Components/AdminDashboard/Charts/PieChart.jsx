@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Chart from 'react-apexcharts';
 import axios from "axios";
 
-const PieChart = ({ selectedDate }) => {
+const PieChart = ({ selectedDateTime }) => {
   
   const [checkinCount, setCheckinCount] = useState(0);
   const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
@@ -13,11 +13,11 @@ const PieChart = ({ selectedDate }) => {
     const fetchData = async () => {
       try {
         setLoading(true); // Đánh dấu đang tải dữ liệu
-        const checkinResponse = await axios.get("http://127.0.0.1:8000/user_checking_data", {
-          params: { date: selectedDate }
+        const checkinResponse = await axios.get("http://127.0.0.1:8000/user_checking", {
+          params: { date: selectedDateTime }
         });
         const borrowedBooksResponse = await axios.get("http://127.0.0.1:8000/get_borrow_book_count", {
-          params: { date: selectedDate }
+          params: { date: selectedDateTime }
         });
         
         setCheckinCount(checkinResponse.data.row_count);
@@ -33,7 +33,7 @@ const PieChart = ({ selectedDate }) => {
     };
 
     fetchData();
-  }, [selectedDate]); // Thêm selectedDate vào mảng dependency của useEffect
+  }, [selectedDateTime]); // Thêm selectedDateTime vào mảng dependency của useEffect
 
   // Kiểm tra nếu không có dữ liệu
   if (!dataAvailable) {

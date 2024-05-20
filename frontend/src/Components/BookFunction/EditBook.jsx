@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../BookFunction/CreateBook.css";
+import { useNotification } from "../Noti/Noti";
 
 const defaultBookImage = "https://via.placeholder.com/150"; // Đường dẫn ảnh mặc định
 
@@ -21,7 +22,7 @@ const EditBook = () => {
     useState(defaultBookImage);
   const [bookImageFile, setBookImageFile] = useState(null);
   const [categoryList, setCategoryList] = useState([]);
-
+  const {showNotification}=useNotification();
   const navigate = useNavigate();
   const handleReset = () => {
     setBookName("");
@@ -88,11 +89,11 @@ const EditBook = () => {
     axios
       .post("http://127.0.0.1:8000/edit_book", formData)
       .then((response) => {
-        console.log("Book edited successfully:", response.data);
+        showNotification("Book edited successfully:", "success");
         navigate("/home/booklist");
       })
       .catch((error) => {
-        console.error("Error saving book data:", error);
+       showNotification("Error saving book data:", "error");
       });
   };
 
