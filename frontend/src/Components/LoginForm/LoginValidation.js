@@ -4,17 +4,21 @@ function Validation(values) {
     const password_pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     
     if (values.usernameTxt === "") {
-        error.usernameTxt = "Tên người dùng không được trống";
+        error.usernameTxt = "Username cannot be empty";
+
     } else if (!username_pattern.test(values.usernameTxt)) {
-        error.usernameTxt = "Tên người dùng không hợp lệ";
+        error.usernameTxt = "Invalid username";
+
     } else {
         error.usernameTxt = "";
     }
 
     if (values.passwordTxt === "") {
-        error.passwordTxt = "Mật khẩu không được để trống";
+        error.passwordTxt = "Password cannot be empty";
+
     } else if (!password_pattern.test(values.passwordTxt)) {
-        error.passwordTxt = "Mật khẩu không hợp lệ";
+        error.passwordTxt = "Invalid password";
+
     } else {
         error.passwordTxt = "";
     }

@@ -6,10 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { useNotification } from "../Noti/Noti";
 
 const Account = () => {
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
   const navigate = useNavigate();
   const { showNotification } = useNotification();
-
-  // Khởi tạo state cho uid và username
   const [uid, setUid] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -26,6 +25,11 @@ const Account = () => {
 
   // Hàm xử lý lưu tài khoản
   const handleSave = async () => {
+    if (!passwordPattern.test(password)) {
+      showNotification("Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character, and be at least 8 characters long.", "error");
+      return;
+    }
+
     if (password !== reenterPassword) {
       showNotification("Passwords do not match", "error");
       return;

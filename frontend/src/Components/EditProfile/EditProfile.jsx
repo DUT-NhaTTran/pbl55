@@ -4,6 +4,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNotification } from "../Noti/Noti";
 import "../Create/Create.css";
+import { isEmailValid } from "../LoginForm/ChangeValidation";
+
 const defaultUserImage = "https://bootdey.com/img/Content/avatar/avatar1.png"; 
 const EditProfile = () => {
   // Lấy uid từ state của useLocation
@@ -81,6 +83,7 @@ const EditProfile = () => {
 
   // Lấy dữ liệu lớp dựa trên FID đã chọn từ back-end
   useEffect(() => {
+
     if (selectedFid) {
       axios
         .post("http://127.0.0.1:8000/get_classes/", { fid: selectedFid })
@@ -97,6 +100,11 @@ const EditProfile = () => {
 
   // Xử lý sự kiện Save
   const handleSave = (e) => {
+    const isValidEmail = isEmailValid(email);
+    if (!isValidEmail) {
+      showNotification("Email is not valid","error");
+      return;
+    }
     e.preventDefault();
     const formData = new FormData();
     formData.append("uid", send_uid);

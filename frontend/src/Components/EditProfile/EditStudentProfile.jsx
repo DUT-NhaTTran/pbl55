@@ -5,6 +5,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../Create/Create.css";
 import { getAuthInfo } from "../LoginForm/auth";
 import { useNotification } from "../Noti/Noti";
+import { isEmailValid } from "../LoginForm/ChangeValidation";
+
 const defaultUserImage = "https://bootdey.com/img/Content/avatar/avatar1.png"; // Đường dẫn đến ảnh mặc định
 
 const EditStudentProfile = () => {
@@ -95,7 +97,13 @@ const EditStudentProfile = () => {
 
   // Xử lý sự kiện Save
   const handleSave = (e) => {
+
     e.preventDefault();
+    const isValidEmail = isEmailValid(email);
+    if (!isValidEmail) {
+      showNotification("Email is not valid","error");
+      return;
+    }
     const formData = new FormData();
     formData.append("uid", send_uid);
     formData.append("name", name);

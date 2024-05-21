@@ -28,7 +28,11 @@ const LoginForm = () => {
           
             // Lưu thông tin đăng nhập
             setAuthInfo(username, role);
-            navigate("/Home");
+            if(role==0){
+              navigate("/home/user");
+
+            }
+            else navigate("/home");
           } else{
             showNotification("Does not exist", "error");
           }

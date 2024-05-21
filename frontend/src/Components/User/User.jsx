@@ -7,7 +7,7 @@ import { getAuthInfo } from "../LoginForm/auth"; // Nhập `getAuthInfo`
 import UserBookList from "../UserBookList/UserBookList";
 import UserHeader from "./UserHeader";
 const User = () => {
-  const { username, role } = getAuthInfo();
+  const { username} = getAuthInfo();
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRecord, setSelectedRecord] = useState(""); // State lưu trữ hàng được chọn
   const [searchQuery, setSearchQuery] = useState("");

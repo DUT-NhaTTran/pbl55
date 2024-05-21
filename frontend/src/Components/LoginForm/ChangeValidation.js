@@ -1,42 +1,53 @@
-function ChangeValidation(values) {
-    let errors = {};
-    const usernamePattern = /^[a-zA-Z0-9_-]{3,16}$/;
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+import React from "react";
+import { useNotification } from "../Noti/Noti";
 
-    // Kiểm tra username
-    if (values.usernameTxt === "") {
-        errors.usernameTxt = "Tên người dùng không được trống";
-    } else if (!usernamePattern.test(values.usernameTxt)) {
-        errors.usernameTxt = "Tên người dùng không hợp lệ";
-    }
+const ChangeValidation = (values, email) => {
+  const { showNotification } = useNotification();
 
-    // Kiểm tra mật khẩu cũ
-    if (values.passwordTxt === "") {
-        errors.passwordTxt = "Mật khẩu không được để trống";
-    } else if (!passwordPattern.test(values.passwordTxt)) {
-        errors.passwordTxt = "Mật khẩu không hợp lệ";
-    }
+  let errors = {};
+  const usernamePattern = /^[a-zA-Z0-9_-]{3,16}$/;
+  const passwordPattern =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-    // Kiểm tra mật khẩu mới
-    if (values.newpasswordTxt === "") {
-        errors.newpasswordTxt = "Mật khẩu mới không được để trống";
-    } else if (!passwordPattern.test(values.newpasswordTxt)) {
-        errors.newpasswordTxt = "Mật khẩu mới không hợp lệ";
-    } else if (values.newpasswordTxt === values.passwordTxt) {
-        errors.newpasswordTxt = "Mật khẩu mới không được trùng với mật khẩu cũ";
-    }
+  // Kiểm tra username
+  if (values.usernameTxt === "") {
+    errors.usernameTxt = "Username cannot be empty";
+  } else if (!usernamePattern.test(values.usernameTxt)) {
+    errors.usernameTxt = "Invalid username";
+  }
 
-    // Kiểm tra xác nhận mật khẩu mới
-    if (values.reenterpasswordTxt === "") {
-        errors.reenterpasswordTxt = "Xác nhận mật khẩu mới không được để trống";
-    } else if (values.reenterpasswordTxt !== values.newpasswordTxt) {
-        errors.reenterpasswordTxt = "Mật khẩu mới và xác nhận mật khẩu không trùng khớp";
-    }
-    if (Object.keys(errors).length > 0) {
-        console.error("Errors found in Validation:", errors);
-    }
+  // Kiểm tra mật khẩu cũ
+  if (values.passwordTxt === "") {
+    errors.passwordTxt = "Password cannot be empty";
+  } else if (!passwordPattern.test(values.passwordTxt)) {
+    errors.passwordTxt = "Invalid password";
+  }
 
-    return errors;
-}
+  // Kiểm tra mật khẩu mới
+  if (values.newpasswordTxt === "") {
+    errors.newpasswordTxt = "New password cannot be empty";
+  } else if (!passwordPattern.test(values.newpasswordTxt)) {
+    errors.newpasswordTxt = "Invalid new password";
+  } else if (values.newpasswordTxt === values.passwordTxt) {
+    errors.newpasswordTxt =
+      "New password cannot be the same as the old password";
+  }
+
+  // Kiểm tra xác nhận mật khẩu mới
+  if (values.reenterpasswordTxt === "") {
+    errors.reenterpasswordTxt = "Confirm new password cannot be empty";
+  } else if (values.reenterpasswordTxt !== values.newpasswordTxt) {
+    errors.reenterpasswordTxt =
+      "New password and confirm password do not match";
+  }
+  if (Object.keys(errors).length > 0) {
+    console.error("Errors found in Validation:", errors);
+  }
+};
+
+export const isEmailValid = (email) => {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailPattern.test(email);
+};
 
 export default ChangeValidation;

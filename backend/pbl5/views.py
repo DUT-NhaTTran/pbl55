@@ -618,6 +618,7 @@ class SortBooks(APIView):
             print(f"Error executing query: {e}")
             return JsonResponse({'error': 'Error executing query'}, status=500)
 
+
 class ViewBorrowBooks(APIView):
     def get(self, request):
         uid = request.GET.get('uid')
@@ -631,9 +632,9 @@ class ViewBorrowBooks(APIView):
                 'bid__id', 'bid__book_name', 'day_borrow', 'day_return', 'limit_day'
             )
 
-            if not borrow_books:
-                print(f"Book borrow not found with UID: {uid}")
-                return JsonResponse({'error': 'Book borrow not found'}, status=404)
+            if not borrow_books.exists():
+                print(f"No records found for UID: {uid}")
+                return JsonResponse({'message': 'No records found'}, status=200)
 
             borrow_book_info_list = []
             for book in borrow_books:
@@ -651,6 +652,7 @@ class ViewBorrowBooks(APIView):
         except Exception as e:
             print(f"Error fetching borrow book info: {e}")
             return JsonResponse({'error': 'Error fetching borrow book info'}, status=500)
+
 
 class SaveBookView(APIView):
     def post(self, request):
