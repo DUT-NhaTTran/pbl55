@@ -214,7 +214,6 @@ export default function BookList() {
               </div>
             </div>
             <div className="checkbox-container">
-              
               <input
                 type="checkbox"
                 className="checkbox"
@@ -266,17 +265,22 @@ export default function BookList() {
                 <span className="author-label">Mô tả: </span>
                 <span className="author-value">{selectedBook.description}</span>
               </div>
-              <div className="book-quantity">
-                <span className="author-label">Enter_book: </span>
-                <span className="author-value">{selectedBook.enter_book}</span>
-              </div>
+
               <div className="modal-footer">
-                <button
+                {/* <button
                   className="edit-button-1"
                   onClick={() => handleEditBook(selectedBook.id)}
                 >
                   Sửa sách
-                </button>
+                </button> */}
+                {role == 1 && (
+                  <button
+                    className="edit-button-1"
+                    onClick={() => handleEditBook(selectedBook.id)}
+                  >
+                    Sửa sách
+                  </button>
+                )}
 
                 <button className="close-button-2" onClick={closeModal}>
                   Đóng

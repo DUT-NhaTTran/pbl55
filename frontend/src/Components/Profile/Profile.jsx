@@ -29,7 +29,8 @@ const Profile = ({ selectedRecord }) => {
       },
       {
         name: "Day Return",
-        selector: (row) => format(new Date(row.day_return), "dd-MM-yyyy"),
+        selector: (row) => row.day_return ? format(new Date(row.day_return), "dd-MM-yyyy") : ""
+
       },
       {
         name: "Limit Day",

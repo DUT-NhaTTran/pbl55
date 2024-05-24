@@ -102,6 +102,9 @@ const Create = () => {
   }, [
     uid, name, email, id, birthDate, gender, selectedFid, selectedClass, avatarFile, showNotification, navigate
   ]);
+  const handleCancel = () => {
+    navigate("/home/studentmanagement");
+  };
 
   // Sử dụng useEffect để khôi phục lại avatarPreviewUrl từ localStorage
   useEffect(() => {
@@ -172,7 +175,7 @@ const Create = () => {
   };
 
   return (
-    <div>
+    <div class="full-width">
       <div className="header">Create Users</div>
       <div className="profile-container">
         <div className="profile-header">
@@ -313,7 +316,7 @@ const Create = () => {
                 <button type="button" className="btn-save" onClick={handleSave}>
                   Save
                 </button>
-                <button type="button" className="btn-cancel">
+                <button type="button" className="btn-cancel" onClick={handleCancel}>
                   Cancel
                 </button>
               </div>

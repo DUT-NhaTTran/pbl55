@@ -1,23 +1,22 @@
 .calendar-icon {
-    position: absolute;
-    top: 40px; /* Điều chỉnh vị trí từ trên xuống */
-    right: 30px; /* Điều chỉnh vị trí từ phải sang trái */
-    font-size: 24px; /* Điều chỉnh kích thước của biểu tượng */
-    color: #333; /* Điều chỉnh màu sắc của biểu tượng */
-  }
-  .custom-calendar {
-    padding: 5px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    outline: none;
-  }
-  .custom-calendar:hover,
-  .custom-calendar:focus {
-    border-color: #007bff;
-  }
-  
-  .calendar-icon {
-    cursor: pointer;
-  }
-  
+  position: absolute;
+  top: 40px; /* Điều chỉnh vị trí từ trên xuống */
+  right: 30px; /* Điều chỉnh vị trí từ phải sang trái */
+  font-size: 24px; /* Điều chỉnh kích thước của biểu tượng */
+  color: #333; /* Điều chỉnh màu sắc của biểu tượng */
+}
+.custom-calendar {
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  outline: none;
+}
+.custom-calendar:hover,
+.custom-calendar:focus {
+  border-color: #007bff;
+}
+
+.calendar-icon {
+  cursor: pointer;
+}

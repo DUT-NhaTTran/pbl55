@@ -3,7 +3,6 @@ import Chart from 'react-apexcharts';
 import axios from "axios";
 
 const PieChart = ({ selectedDateTime }) => {
-  
   const [checkinCount, setCheckinCount] = useState(0);
   const [borrowedBooksCount, setBorrowedBooksCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -13,7 +12,7 @@ const PieChart = ({ selectedDateTime }) => {
     const fetchData = async () => {
       try {
         setLoading(true); // Đánh dấu đang tải dữ liệu
-        const checkinResponse = await axios.get("http://127.0.0.1:8000/user_checking", {
+        const checkinResponse = await axios.get("http://127.0.0.1:8000/user_checking_data", {
           params: { date: selectedDateTime }
         });
         const borrowedBooksResponse = await axios.get("http://127.0.0.1:8000/get_borrow_book_count", {
@@ -42,8 +41,8 @@ const PieChart = ({ selectedDateTime }) => {
 
   const remainingBorrowedBooks = borrowedBooksCount - checkinCount;
   const data = {
-    Checkin: checkinCount,
-    RemainingBorrowedBooks: remainingBorrowedBooks,
+    Late: checkinCount,
+    Intime: remainingBorrowedBooks,
   };
 
   const options = {
@@ -66,8 +65,8 @@ const PieChart = ({ selectedDateTime }) => {
       <h3 className="chart-title">Pie Chart</h3>
       <Chart options={options} series={series} type="pie" height={350} />
       <p>Total Borrowed Books: {borrowedBooksCount}</p>
-      <p>Total Checked-in Books Late: {checkinCount}</p>
-      <p>Remaining Checked-in: {remainingBorrowedBooks}</p>
+      <p>Total late Check-in: {checkinCount}</p>
+      <p>Remaining On-time Check-ins: {remainingBorrowedBooks}</p>
     </div>
   );
 };

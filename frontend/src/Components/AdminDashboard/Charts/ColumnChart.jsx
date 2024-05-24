@@ -3,7 +3,7 @@ import ReactApexChart from 'react-apexcharts';
 import axios from "axios";
 import "./Charts.css";
 
-const ColumnChart = ({selectedDateTime}) => {
+const ColumnChart = ({ selectedDateTime }) => {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
@@ -19,21 +19,21 @@ const ColumnChart = ({selectedDateTime}) => {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
-  }, [selectedDateTime]); // Thêm selectedDateTime vào danh sách dependency
-  
+  }, [selectedDateTime]);
 
   const totalBooks = chartData.reduce((acc, item) => acc + item.count, 0);
-  const maxBooks = Math.ceil(totalBooks * 1.5); // Làm tròn lên để đảm bảo không có số thập phân
+  const maxBooks = Math.ceil(totalBooks * 0.5);
+  const tickAmount = 10;
+  const tickStep = Math.ceil(maxBooks / tickAmount);
 
-  // Kiểm tra xem chartData có rỗng hay không
   if (chartData.length === 0) {
     const emptySeries = [{ name: 'Number of Books', data: [0] }];
     const emptyOptions = {
       chart: {
         height: 350,
-        width: "10%", // Chỉnh lại width
+        width: "10%",
         type: "bar",
       },
       plotOptions: {
@@ -45,7 +45,7 @@ const ColumnChart = ({selectedDateTime}) => {
         enabled: false,
       },
       xaxis: {
-        categories: ['No data'], // Không có dữ liệu, chỉ có một nhãn 'No data'
+        categories: ['No data'],
         title: {
           text: "Tag",
         },
@@ -54,11 +54,11 @@ const ColumnChart = ({selectedDateTime}) => {
         title: {
           text: "Number of Books",
         },
-        min: 0, // Đặt giá trị min cho trục y
-        max: 10, // Đặt giá trị max cho trục y là 10 (giả định)
-        tickAmount: 10, // Đảm bảo số lượng tick trên trục y là số nguyên
+        min: 0,
+        max: 10,
+        tickAmount: 10,
         labels: {
-          formatter: (val) => Math.round(val), // Định dạng nhãn trục y để đảm bảo không có số thập phân
+          formatter: (val) => Math.round(val),
         },
       },
     };
@@ -79,7 +79,7 @@ const ColumnChart = ({selectedDateTime}) => {
   const options = {
     chart: {
       height: 350,
-      width: "10%", // Chỉnh lại width
+      width: "10%",
       type: "bar",
     },
     plotOptions: {
@@ -100,11 +100,11 @@ const ColumnChart = ({selectedDateTime}) => {
       title: {
         text: "Number of Books",
       },
-      min: 0, // Đặt giá trị min cho trục y
-      max: maxBooks, // Đặt giá trị max cho trục y dựa trên tổng số sách * 1.5
-      tickAmount: maxBooks, // Đảm bảo số lượng tick trên trục y là số nguyên
+      min: 0,
+      max: tickStep * tickAmount,
+      tickAmount: tickAmount,
       labels: {
-        formatter: (val) => Math.round(val), // Định dạng nhãn trục y để đảm bảo không có số thập phân
+        formatter: (val) => Math.round(val),
       },
     },
   };
@@ -127,4 +127,4 @@ const ColumnChart = ({selectedDateTime}) => {
   );
 };
 
-export default ColumnChart
+export default ColumnChart;

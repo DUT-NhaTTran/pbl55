@@ -18,7 +18,9 @@ const StudentChecking = () => {
     // Hàm lấy dữ liệu từ API
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/user_checking");
+        const response = await axios.get(
+          "http://127.0.0.1:8000/user_checking"
+        );
         setData(response.data.results);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -38,7 +40,9 @@ const StudentChecking = () => {
   // Hàm fetchData để lấy dữ liệu từ API
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/user_checking");
+      const response = await axios.get(
+        "http://127.0.0.1:8000/user_checking"
+      );
       setRecords(response.data.results);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -117,34 +121,30 @@ const StudentChecking = () => {
       name: "Name",
       selector: (row) => row.name,
     },
-   
+
     {
-        name: "Gender",
-        selector: (row) => {
-          if (row.gender === 0) {
-            return "Female";
-          } else if (row.gender === 1) {
-            return "Male";
-          } else {
-            return ""; // Hoặc giá trị mặc định khác nếu cần
-          }
-        },
+      name: "Gender",
+      selector: (row) => {
+        if (row.gender === 0) {
+          return "Female";
+        } else if (row.gender === 1) {
+          return "Male";
+        } else {
+          return ""; // Hoặc giá trị mặc định khác nếu cần
+        }
       },
-      
-    
-    
+    },
+
     {
-        name: "Faculty",
-        selector: (row) => row.faculty_name,
-        
-      },
+      name: "Faculty",
+      selector: (row) => row.faculty_name,
+    },
     {
       name: "Class Name",
       selector: (row) => row.class_name,
     },
   ];
   return (
-    
     <div className="student-list-container">
       <div
         className={
@@ -153,8 +153,8 @@ const StudentChecking = () => {
       >
         <StudentHeader handleSearch={handleSearch} />
         <button className="delete-selected-btn" onClick={handleDeleteSelected}>
-                Delete Selected
-            </button>
+          Delete Selected
+        </button>
 
         <DataTable
           columns={columns}

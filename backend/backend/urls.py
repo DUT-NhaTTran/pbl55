@@ -29,6 +29,7 @@ urlpatterns = [
     path('get_fids',GetFidView.as_view(), name='get_fids'),
     path('get_classes/', GetClassesView.as_view(), name='get_classes'),
     path('save_user', SaveUserView.as_view(), name='save_user'),
+    path('save_checkin', SaveCheckin.as_view(), name='save_checkin'),
     path('save_account', SaveAccountView.as_view(), name='save_account'), 
     path('get_avatar_url', GetAvatarURLView.as_view(), name='get_avatar_url'),
     path('get_tags',GetCategoriesView.as_view(),name='get_tags'),

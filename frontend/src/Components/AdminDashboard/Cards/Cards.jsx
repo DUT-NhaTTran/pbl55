@@ -21,7 +21,7 @@ export default function Cards({ data }) {
     title === "Total Book" || title === "Total Checkin";
 
   // Determine the unit based on the title
-  const unit = title === "Total Checkin" ? "people" : "books";
+  const unit = title === "Total Checkin" ? "turns" : "books";
 
   return (
     <div className="card" style={{ backgroundColor }}>
@@ -36,7 +36,6 @@ export default function Cards({ data }) {
               end={numericAmount}
               duration={2}
               separator=","
-              prefix={displayDollarSign ? "$" : ""}
             />
             {isNumericAmount && ` ${unit}`}
           </h2>

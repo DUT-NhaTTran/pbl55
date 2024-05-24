@@ -14,6 +14,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    
   }
   
   .edit-button svg {
@@ -24,7 +25,9 @@
     font-size: 30px; 
     font-weight: bold;
     color:#526d82;
-    margin-right: auto; /* Đẩy tiêu đề sang bên trái */
+
+    margin-right: auto;
+    
   }
   .edit-button:hover svg {
     color: #0056b3; /* Màu biểu tượng khi di chuột qua */
@@ -37,7 +40,9 @@
     background:#dde6ed;
     flex-direction: column;
     display: flex;
+    margin-bottom:2rem;
     padding:10px;
+    
 }
 .user--detail{
     width: 100%;

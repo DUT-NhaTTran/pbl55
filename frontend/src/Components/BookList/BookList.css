@@ -3,6 +3,7 @@
     flex-wrap: wrap;
     margin-top: 2rem;
     margin-left: 1rem;
+    justify-content: center;
 }
 .booklist-page {
     display: block; 
@@ -134,13 +135,25 @@ color:#969393;
     display: flex;
     justify-content: flex-end;
 }
-.search-sort-container {
+/* .search-sort-container {
     display: flex;
     flex: 1;
     justify-content: flex-end;
     align-items: center;
     gap: 150px;
+} */
+.search-sort-container {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 150px;
+    background-color: white; /* Tùy chỉnh màu nền nếu cần thiết */
+    padding: 10px; /* Tùy chỉnh padding nếu cần thiết */
+    z-index: 999; /* Đặt z-index để nằm trên các phần tử khác */
 }
+
 
 .book-actions-1 {
     display: flex; /* Sử dụng flexbox */

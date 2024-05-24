@@ -7,17 +7,22 @@ import { IoCalendar } from "react-icons/io5"; // Import icon
 import "./AdminDashboard.css";
 
 const toVietnamISOString = (date) => {
-  const tzOffset = 7 * 60 * 60 * 1000; 
+  const tzOffset = 7 * 60 * 60 * 1000; // Vietnam timezone offset (in milliseconds)
   const vietnamTime = new Date(date.getTime() + tzOffset);
   return vietnamTime.toISOString().slice(0, -1); // Remove the 'Z' at the end
 };
 
+const getCurrentDateTime = () => {
+  const now = new Date();
+  return toVietnamISOString(now);
+};
+
 const AdminDashboard = () => {
   const timeZone = "Asia/Ho_Chi_Minh"; // Vietnam timezone
-  const today = new Date().toLocaleDateString('en-CA', { timeZone }); // Format as YYYY-MM-DD in Vietnam time
+  const today = new Date().toLocaleDateString("en-CA", { timeZone }); // Format as YYYY-MM-DD in Vietnam time
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(today);
-  const [selectedDateTime, setSelectedDateTime] = useState(toVietnamISOString(new Date())); 
+  const [selectedDateTime, setSelectedDateTime] = useState(getCurrentDateTime()); // Initialize with current datetime
 
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
@@ -26,13 +31,16 @@ const AdminDashboard = () => {
   const handleDateChange = (event) => {
     const dateValue = event.target.value;
     setSelectedDate(dateValue); // Update displayed date
-    const [hours, minutes, seconds] = new Date(selectedDateTime).toLocaleTimeString('en-GB', { timeZone, hour12: false }).split(':');
-    const newDateTime = new Date(`${dateValue}T${hours}:${minutes}:${seconds}+07:00`).toISOString();
-    setSelectedDateTime(newDateTime);
+    const newDateTime = `${dateValue}T${new Date().toLocaleTimeString("en-GB", {
+      timeZone,
+      hour12: false,
+    })}`;
+    setSelectedDateTime(toVietnamISOString(new Date(newDateTime))); // Update selected datetime with current time
   };
 
   useEffect(() => {
-    console.log("in",selectedDateTime); // Log full datetime
+    // Send selectedDateTime to backend
+    console.log("Sending selectedDateTime to backend:", selectedDateTime);
   }, [selectedDateTime]);
 
   return (
