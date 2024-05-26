@@ -130,7 +130,7 @@ const EditStudentProfile = () => {
 
   // Xử lý sự kiện Cancel
   const handleCancel = () => {
-    navigate("/home/content");
+    navigate("/home/user");
   };
 
   // Xử lý khi người dùng chọn file ảnh

@@ -7,7 +7,7 @@ import { getAuthInfo } from "../LoginForm/auth"; // Nhập `getAuthInfo`
 import UserBookList from "../UserBookList/UserBookList";
 import UserHeader from "./UserHeader";
 const User = () => {
-  const { username} = getAuthInfo();
+  const { username } = getAuthInfo();
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRecord, setSelectedRecord] = useState(""); // State lưu trữ hàng được chọn
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,7 +28,6 @@ const User = () => {
             // Kiểm tra kết quả của API để đảm bảo rằng dữ liệu hợp lệ
             if (res.data && Array.isArray(res.data)) {
               setRecords(res.data);
-
             } else {
               console.error(
                 "Invalid API response data for borrow book info list."
@@ -74,7 +73,8 @@ const User = () => {
     },
     {
       name: "Day Return",
-      selector: (row) => format(new Date(row.day_return), "dd-MM-yyyy"),
+      selector: (row) =>
+        row.day_return ? format(new Date(row.day_return), "dd-MM-yyyy") : "",
     },
     {
       name: "Limit Day",
@@ -85,8 +85,6 @@ const User = () => {
   const handleSearch = async (event) => {
     const query = event.target.value;
     setSearchQuery(query);
-
-
 
     if (query) {
       try {
@@ -109,9 +107,9 @@ const User = () => {
   };
   const filteredRecords = records.filter(
     (record) =>
-        record.book_name && record.book_name.toLowerCase().includes(searchQuery.toLowerCase())
-);
-
+      record.book_name &&
+      record.book_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="book-list-container">

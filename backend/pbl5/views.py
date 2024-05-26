@@ -751,11 +751,11 @@ class SortBooks(APIView):
         if sort_option == 'name-asc':
             order_by = 'book_name'
         elif sort_option == 'name-desc':
-            order_by = 'book_name'
+            order_by = '-book_name'
         elif sort_option == 'quantity-asc':
             order_by = 'quantity'
         elif sort_option == 'quantity-desc':
-            order_by = 'quantity'
+            order_by = '-quantity'
         else:
             return JsonResponse({'books': []})
 

@@ -1,9 +1,5 @@
-import React from "react";
-import { useNotification } from "../Noti/Noti";
-
-const ChangeValidation = (values, email) => {
-  const { showNotification } = useNotification();
-
+// ChangeValidation.js
+const ChangeValidation = (values) => {
   let errors = {};
   const usernamePattern = /^[a-zA-Z0-9_-]{3,16}$/;
   const passwordPattern =
@@ -40,14 +36,15 @@ const ChangeValidation = (values, email) => {
     errors.reenterpasswordTxt =
       "New password and confirm password do not match";
   }
+
   if (Object.keys(errors).length > 0) {
     console.error("Errors found in Validation:", errors);
   }
-};
 
+  return errors;
+};
 export const isEmailValid = (email) => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailPattern.test(email);
 };
-
 export default ChangeValidation;

@@ -1,13 +1,31 @@
-import React from "react";
+// ChangeAccount.js
+import React, { useState } from "react";
 import "./LoginForm.css";
 import { FaUser, FaLock } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import ChangeValidation from "./ChangeValidation";
 import axios from "axios";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ChangeValidation from "./ChangeValidation";
 import { useNotification } from "../Noti/Noti";
 
 const ChangeAccount = () => {
+  const [values, setValues] = useState({
+    usernameTxt: "",
+    passwordTxt: "",
+    newpasswordTxt: "",
+    reenterpasswordTxt: "",
+  });
+  const [errors, setErrors] = useState({});
+  const { showNotification } = useNotification();
+  const navigate = useNavigate();
+
+  const handleInput = (e) => {
+    const { name, value } = e.target;
+    setValues((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = ChangeValidation(values);
@@ -22,11 +40,10 @@ const ChangeAccount = () => {
         );
 
         if (response.data.message === "Success") {
-          showNotification("Successfully changed","success");
+          showNotification("Successfully changed", "success");
           navigate("/"); // Chuyển hướng đến trang chủ
         } else {
-          showNotification("Account or password does not exist"
-          , "error");
+          showNotification("Account or password does not exist", "error");
         }
       } catch (err) {
         // Xử lý lỗi
@@ -50,18 +67,7 @@ const ChangeAccount = () => {
       }
     }
   };
-  const { showNotification } = useNotification();
-  const navigate = useNavigate();
-  const [values, setValues] = useState({
-    usernameTxt: "",
-    passwordTxt: "",
-    newpasswordTxt: "",
-    reenterpasswordTxt: "",
-  });
-  const [errors, setErrors] = useState({});
-  const handleInput = (e) => {
-    setValues((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+
   return (
     <div className="wrapper">
       <form action="" onSubmit={handleSubmit}>
@@ -75,9 +81,7 @@ const ChangeAccount = () => {
             required
           />
           <FaUser className="icon" />
-          {errors.usernameTxt && (
-            <span className="text-danger">{errors.usernameTxt}</span>
-          )}
+         
         </div>
         <div className="input-box">
           <input
@@ -88,9 +92,7 @@ const ChangeAccount = () => {
             required
           />
           <FaLock className="icon" />
-          {errors.passwordTxt && (
-            <span className="text-danger">{errors.passwordTxt}</span>
-          )}
+         
         </div>
         <div className="input-box">
           <input
@@ -101,9 +103,7 @@ const ChangeAccount = () => {
             required
           />
           <FaLock className="icon" />
-          {errors.passwordTxt && (
-            <span className="text-danger">{errors.passwordTxt}</span>
-          )}
+          
         </div>
         <div className="input-box">
           <input
@@ -114,9 +114,7 @@ const ChangeAccount = () => {
             required
           />
           <FaLock className="icon" />
-          {errors.passwordTxt && (
-            <span className="text-danger">{errors.passwordTxt}</span>
-          )}
+          
         </div>
 
         <button type="submit">Save Change</button>
