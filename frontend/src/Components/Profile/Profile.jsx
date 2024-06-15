@@ -12,6 +12,7 @@ import { toZonedTime } from 'date-fns-tz';
 const Profile = ({ selectedRecord }) => {
   const suid = selectedRecord.uid;
 
+  console.log("record",selectedRecord);
   const [borrowBooks, setBorrowBooks] = useState([]); // Sách được chọn
   const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái của modal
   

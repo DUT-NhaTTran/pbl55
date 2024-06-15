@@ -59,16 +59,13 @@ const StudentList = () => {
       // Process the response data
       const recordsWithId = response.data.map(record => ({
         ...record,
-        id: `${record.uid}-${record.time_in}-${record.time_out}`
       }));
       setRecords(recordsWithId);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  const handleCreate = async () => {
-    navigate("/home/createcheckin");
-  };
+  
   const handleSearch = async (event) => {
     const query = event.target.value;
     setSearchQuery(query);
@@ -188,9 +185,9 @@ const StudentList = () => {
             max={new Date().toISOString().split("T")[0]} // Set max date to today
           />
         )}
-        <button className="create-btn" onClick={handleCreate}>
+        {/* <button className="create-btn" onClick={handleCreate}>
           Create Checkin
-        </button>
+        </button> */}
         <button className="create-btn" onClick={handleViewAll}>
           View All
         </button>
