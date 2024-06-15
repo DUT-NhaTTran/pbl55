@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useNotification } from "../Noti/Noti";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../Create/Create.css";
+import config from '../../config'; // Import file cấu hình
 
 const Create = () => {
   const { showNotification } = useNotification();
@@ -84,7 +85,7 @@ const Create = () => {
     formData.append("avatar", avatarFile);
 
     try {
-        await axios.post("http://127.0.0.1:8000/save_user", formData);
+        await axios.post(`${config.apiUrl}/save_user`, formData);
         showNotification("User saved successfully", "success");
         localStorage.setItem("uid", uid);
         localStorage.setItem("name", name);
@@ -140,8 +141,8 @@ const Create = () => {
     const fetchData = async () => {
       try {
         const [fidResponse, classResponse] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/get_fids"),
-          selectedFid && axios.post("http://127.0.0.1:8000/get_classes/", {
+          axios.get(`${config.apiUrl}/get_fids`),
+          selectedFid && axios.post(`${config.apiUrl}/get_classes/`, {
             fid: selectedFid,
           }),
         ]);

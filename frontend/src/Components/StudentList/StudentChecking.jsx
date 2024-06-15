@@ -5,7 +5,7 @@ import DataTable from "react-data-table-component";
 import "../StudentList/StudentList.css";
 import Profile from "../Profile/Profile";
 import "../Profile/Profile.css";
-import { format } from "date-fns";
+import config from '../../config'; // Import file cấu hình
 import { useNotification } from "../Noti/Noti";
 const StudentChecking = () => {
   const [records, setRecords] = useState([]);
@@ -14,12 +14,13 @@ const StudentChecking = () => {
   const [selectedRecord, setSelectedRecord] = useState(""); // State lưu trữ hàng được chọn
   const [data, setData] = useState([]);
   const { showNotification } = useNotification();
+  
   useEffect(() => {
     // Hàm lấy dữ liệu từ API
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/user_checking"
+          `${config.apiUrl}/user_checking`
         );
         setData(response.data.results);
       } catch (error) {
@@ -41,7 +42,7 @@ const StudentChecking = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/user_checking"
+        `${config.apiUrl}/user_checking`
       );
       setRecords(response.data.results);
     } catch (err) {
@@ -56,7 +57,7 @@ const StudentChecking = () => {
 
     if (query) {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/user/search", {
+        const response = await axios.get(`${config.apiUrl}/user/search`, {
           params: { searchQuery: query },
         });
         setRecords(response.data);
@@ -76,7 +77,7 @@ const StudentChecking = () => {
     }
 
     try {
-      await axios.delete("http://127.0.0.1:8000/user/delete", {
+      await axios.delete(`${config.apiUrl}/user/deletecheckin`, {
         data: { uids: selectedRows },
       });
 

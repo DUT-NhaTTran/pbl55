@@ -7,6 +7,7 @@ import Profile from "../Profile/Profile";
 import "../Profile/Profile.css";
 import { useNotification } from "../Noti/Noti";
 import { useNavigate } from "react-router-dom";
+import config from '../../config'; // Import file cấu hình
 
 const StudentMagagement = () => {
   const [records, setRecords] = useState([]);
@@ -20,7 +21,7 @@ const StudentMagagement = () => {
     // Hàm lấy dữ liệu từ API
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/user_manage");
+        const response = await axios.get(`${config.apiUrl}/user_manage`);
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -40,7 +41,7 @@ const StudentMagagement = () => {
   // Hàm fetchData để lấy dữ liệu từ API
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/user_manage");
+      const response = await axios.get(`${config.apiUrl}/user_manage`);
       setRecords(response.data);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -54,7 +55,7 @@ const StudentMagagement = () => {
 
     if (query) {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/user/search", {
+        const response = await axios.get(`${config.apiUrl}/user/search`, {
           params: { searchQuery: query },
         });
         setRecords(response.data);
@@ -74,7 +75,7 @@ const StudentMagagement = () => {
     }
 
     try {
-      await axios.delete("http://127.0.0.1:8000/user/delete", {
+      await axios.delete(`${config.apiUrl}/user/delete`, {
         data: { uids: selectedRows },
       });
 

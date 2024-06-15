@@ -6,6 +6,8 @@ import DataTable from "react-data-table-component";
 import { getAuthInfo } from "../LoginForm/auth"; // Nhập `getAuthInfo`
 import UserBookList from "../UserBookList/UserBookList";
 import UserHeader from "./UserHeader";
+import config from '../../config';
+import { toZonedTime } from 'date-fns-tz';
 const User = () => {
   const { username } = getAuthInfo();
   const [selectedRows, setSelectedRows] = useState([]);
@@ -23,7 +25,7 @@ const User = () => {
     const fetchData = async () => {
       try {
         axios
-          .get(`http://127.0.0.1:8000/view_borrow_books?uid=${username}`)
+          .get(`${config.apiUrl}/view_borrow_books?uid=${username}`)
           .then((res) => {
             // Kiểm tra kết quả của API để đảm bảo rằng dữ liệu hợp lệ
             if (res.data && Array.isArray(res.data)) {
@@ -49,7 +51,7 @@ const User = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8000/view_borrow_books?uid=${username}`
+        `${config.apiUrl}/view_borrow_books?uid=${username}`
       );
 
       setRecords(response.data);
@@ -69,16 +71,31 @@ const User = () => {
     },
     {
       name: "Day Borrowed",
-      selector: (row) => format(new Date(row.day_borrow), "dd-MM-yyyy"),
+      // selector: (row) => format(new Date(row.day_borrow), "dd-MM-yyyy"),
+      selector: (row) => {
+        const date = toZonedTime(new Date(row.day_borrow), 'UTC');
+        return format(date, 'dd-MM-yyyy');
+      },
     },
     {
       name: "Day Return",
-      selector: (row) =>
-        row.day_return ? format(new Date(row.day_return), "dd-MM-yyyy") : "",
+      // selector: (row) =>
+      //   row.day_return ? format(new Date(row.day_return), "dd-MM-yyyy") : "",
+      selector: (row) => {
+        if (!row.day_return) {
+          return "";
+        }
+        const date = toZonedTime(new Date(row.day_return), 'UTC');
+        return format(date, 'dd-MM-yyyy');
+      },
     },
     {
       name: "Limit Day",
       selector: (row) => row.limit_day,
+    },
+    {
+      name: "Current Total Borrow",
+      selector: (row) => row.bquantity,
     },
   ];
 
@@ -89,7 +106,7 @@ const User = () => {
     if (query) {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/search_books_dtb",
+          `${config.apiUrl}/search_books_dtb`,
           {
             params: {
               username: username,

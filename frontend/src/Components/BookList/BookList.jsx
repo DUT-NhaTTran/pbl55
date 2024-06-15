@@ -7,9 +7,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BiSearch } from "react-icons/bi";
 import ReactModal from "react-modal";
 import { useNavigate } from "react-router-dom";
-import AdvancedSearch from "./AdvancedSearch";
 import { useNotification } from "../Noti/Noti";
 import { getAuthInfo } from "../LoginForm/auth";
+import config from '../../config'; 
 
 export default function BookList() {
   const [books, setBooks] = useState([]);
@@ -18,7 +18,6 @@ export default function BookList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [SortOption, setSortOption] = useState("");
-
   const { role } = getAuthInfo();
   const { showNotification } = useNotification();
 
@@ -28,12 +27,12 @@ export default function BookList() {
       let response;
       if (tag === "" || tag === "all") {
         // Lấy tất cả sách
-        response = await axios.get("http://127.0.0.1:8000/get_books_info");
+        response = await axios.get(`${config.apiUrl}/get_books_info`);
         setBooks(response.data.books_info);
       } else {
         // Lấy sách theo tag cụ thể
         response = await axios.get(
-          `http://127.0.0.1:8000/books_by_tag?tag=${tag}`
+          `${config.apiUrl}/books_by_tag?tag=${tag}`
         );
         setBooks(response.data.books_list);
       }
@@ -53,7 +52,7 @@ export default function BookList() {
       try {
         const lowerCaseQuery = query.toLowerCase();
         const response = await axios.get(
-          `http://127.0.0.1:8000/search_books?query=${lowerCaseQuery}`
+          `${config.apiUrl}/search_books?query=${lowerCaseQuery}`
         );
         setBooks(response.data.books);
       } catch (error) {
@@ -70,7 +69,7 @@ export default function BookList() {
     if (sortOption !== "") {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/sort_books?sortOption=${sortOption}`
+          `${config.apiUrl}/sort_books?sortOption=${sortOption}`
         );
         setBooks(response.data.books);
       } catch (error) {
@@ -83,7 +82,7 @@ export default function BookList() {
 
   const fetchAllBooks = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/get_books_info");
+      const response = await axios.get(`${config.apiUrl}/get_books_info`);
       setBooks(response.data.books_info);
     } catch (error) {
       console.error("Error fetching all books:", error);
@@ -135,7 +134,7 @@ export default function BookList() {
     const bookIds = selectedBooks.map((book) => book.id); // Retrieve book IDs
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/delete_books", {
+      const response = await axios.post(`${config.apiUrl}/delete_books`, {
         ids: bookIds,
       });
 
@@ -267,12 +266,7 @@ export default function BookList() {
               </div>
 
               <div className="modal-footer">
-                {/* <button
-                  className="edit-button-1"
-                  onClick={() => handleEditBook(selectedBook.id)}
-                >
-                  Sửa sách
-                </button> */}
+               
                 {role == 1 && (
                   <button
                     className="edit-button-1"

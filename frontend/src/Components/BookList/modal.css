@@ -1,4 +1,3 @@
-/* Định dạng lớp phủ (overlay) */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -27,6 +26,7 @@
   max-width: 250px; 
   height: 250px; 
   object-fit: contain; 
+
 }
 
 .modal-info {
@@ -40,7 +40,7 @@
   justify-content: flex-end; /* Căn phải */
   margin-top: 20px;
   padding-right: 20px; /* Điều chỉnh khoảng cách từ bên phải */
-}
+} */
 
 /* Định dạng cho nút đóng */
 .close-button {

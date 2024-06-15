@@ -8,6 +8,7 @@ import Profile from "../Profile/Profile";
 import "../Profile/Profile.css";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../Noti/Noti";
+import config from '../../config'; 
 
 const StudentList = () => {
   const [records, setRecords] = useState([]);
@@ -29,27 +30,52 @@ const StudentList = () => {
     fetchData();
   }, [selectedDate]);
 
+  // const fetchData = async () => {
+  //   try {
+  //     const dateToFetch = selectedDate || new Date().toISOString().split("T")[0];
+  //     // Clear old records before fetching new ones
+  //     setRecords([]);
+  //     const response = await axios.get(`${config.apiUrl}/user`, {
+  //       params: { selectedDate: dateToFetch }
+  //     });
+  //     setRecords(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
   const fetchData = async () => {
     try {
-      const dateToFetch = selectedDate || new Date().toISOString().split("T")[0];
+      // Determine the date to fetch: use selectedDate if it's set, otherwise fetch for today
+      const dateToFetch = selectedDate !== "" ? selectedDate : null;
+      
       // Clear old records before fetching new ones
       setRecords([]);
-      const response = await axios.get("http://127.0.0.1:8000/user", {
+      
+      // Make the API request
+      const response = await axios.get(`${config.apiUrl}/user`, {
         params: { selectedDate: dateToFetch }
       });
-      setRecords(response.data);
+      
+      // Process the response data
+      const recordsWithId = response.data.map(record => ({
+        ...record,
+        id: `${record.uid}-${record.time_in}-${record.time_out}`
+      }));
+      setRecords(recordsWithId);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-
+  const handleCreate = async () => {
+    navigate("/home/createcheckin");
+  };
   const handleSearch = async (event) => {
     const query = event.target.value;
     setSearchQuery(query);
 
     if (query) {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/user/search", {
+        const response = await axios.get(`${config.apiUrl}/user/search`, {
           params: { searchQuery: query },
         });
         setRecords(response.data);
@@ -61,33 +87,35 @@ const StudentList = () => {
     }
   };
 
-  const handleCreate = async () => {
-    navigate("/home/createcheckin");
+  const handleViewAll = () => {
+    setSelectedDate(null); // Set selectedDate to null
   };
 
   const formatTime = (timeString) => {
+    if (!timeString) return ""; // Handle cases where timeString is null or undefined
     return timeString.replace("T", " ").replace("Z", "");
   };
+  
 
-  const handleDeleteSelected = async () => {
-    if (selectedRows.length === 0) {
-      showNotification("Please select records to delete.", "error");
-      return;
-    }
+  // const handleDeleteSelected = async () => {
+  //   if (selectedRows.length === 0) {
+  //     showNotification("Please select records to delete.", "error");
+  //     return;
+  //   }
 
-    try {
-      await axios.delete("http://127.0.0.1:8000/user/delete", {
-        data: { uids: selectedRows },
-      });
+  //   try {
+  //     await axios.delete(`${config.apiUrl}/user/deletecheckin`, {
+  //       data: { uids: selectedRows },
+  //     });
 
-      showNotification("Records deleted successfully.", "success");
-      fetchData();
-      setSelectedRows([]);
-    } catch (err) {
-      console.error("Error deleting records:", err);
-      showNotification("Error deleting records.", "error");
-    }
-  };
+  //     showNotification("Records deleted successfully.", "success");
+  //     fetchData();
+  //     setSelectedRows([]);
+  //   } catch (err) {
+  //     console.error("Error deleting records:", err);
+  //     showNotification("Error deleting records.", "error");
+  //   }
+  // };
 
   const filteredRecords = records.filter(
     (record) =>
@@ -160,13 +188,13 @@ const StudentList = () => {
             max={new Date().toISOString().split("T")[0]} // Set max date to today
           />
         )}
-
         <button className="create-btn" onClick={handleCreate}>
           Create Checkin
         </button>
-        <button className="delete-selected-btn" onClick={handleDeleteSelected}>
-          Delete Selected
+        <button className="create-btn" onClick={handleViewAll}>
+          View All
         </button>
+        
 
         <DataTable
           columns={columns}

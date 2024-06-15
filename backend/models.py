@@ -53,12 +53,13 @@ class Books(models.Model):
 
 
 class Cards(models.Model):
-    ca_id = models.IntegerField(primary_key=True)
+    ca_id = models.AutoField(primary_key=True)
     sid = models.ForeignKey('Users', models.DO_NOTHING, db_column='sid', blank=True, null=True)
     bid = models.ForeignKey(Books, models.DO_NOTHING, db_column='bid', blank=True, null=True)
-    day_borrow = models.DateField(blank=True, null=True)
-    day_return = models.DateField(blank=True, null=True)
+    day_borrow = models.DateTimeField(blank=True, null=True)
+    day_return = models.DateTimeField(blank=True, null=True)
     limit_day = models.IntegerField(blank=True, null=True)
+    borrow_quantity = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

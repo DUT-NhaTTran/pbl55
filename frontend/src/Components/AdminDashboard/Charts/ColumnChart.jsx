@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactApexChart from 'react-apexcharts';
 import axios from "axios";
 import "./Charts.css";
+import config from '../../../config'; // Import file cấu hình
 
 const ColumnChart = ({ selectedDateTime }) => {
   const [chartData, setChartData] = useState([]);
@@ -9,7 +10,7 @@ const ColumnChart = ({ selectedDateTime }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/get_tags_and_counts", {
+        const response = await axios.get(`${config.apiUrl}/get_tags_and_counts`, {
           params: {
             date: selectedDateTime
           }

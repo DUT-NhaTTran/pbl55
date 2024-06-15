@@ -4,6 +4,7 @@ import "../Create/Create.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../Noti/Noti";
+import config from '../../config'; // Import file cấu hình
 
 const Account = () => {
   const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
@@ -42,7 +43,7 @@ const Account = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/save_account",
+      `${config.apiUrl}/save_account`,
         data
       );
       showNotification("Account created successfully", "success");

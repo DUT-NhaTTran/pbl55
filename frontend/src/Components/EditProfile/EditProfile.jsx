@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNotification } from "../Noti/Noti";
 import "../Create/Create.css";
 import { isEmailValid } from "../LoginForm/ChangeValidation";
+import config from '../../config'; // Import file cấu hình
 
 const defaultUserImage = "https://bootdey.com/img/Content/avatar/avatar1.png"; 
 const EditProfile = () => {
@@ -44,7 +45,7 @@ const EditProfile = () => {
   useEffect(() => {
     if (send_uid) {
       axios
-        .get(`http://127.0.0.1:8000/get_user_info?uid=${send_uid}`)
+        .get(`${config.apiUrl}/get_user_info?uid=${send_uid}`)
         .then((response) => {
           const userData = response.data;
           // Cập nhật state với thông tin người dùng từ back-end
@@ -70,7 +71,7 @@ const EditProfile = () => {
   // Lấy dữ liệu FID từ back-end
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/get_fids")
+      .get(`${config.apiUrl}/get_fids`)
       .then((response) => {
         if (response.data && Array.isArray(response.data.fids)) {
           setFidList(response.data.fids);
@@ -86,7 +87,7 @@ const EditProfile = () => {
 
     if (selectedFid) {
       axios
-        .post("http://127.0.0.1:8000/get_classes/", { fid: selectedFid })
+        .post(`${config.apiUrl}/get_classes/`, { fid: selectedFid })
         .then((response) => {
           if (response.data && Array.isArray(response.data.classes)) {
             setClassList(response.data.classes);
@@ -119,7 +120,7 @@ const EditProfile = () => {
       formData.append("avatar", avatarFile);
     }
     axios
-      .post("http://127.0.0.1:8000/edit_user_view", formData)
+      .post(`${config.apiUrl}/edit_user_view`, formData)
       .then((response) => {
         showNotification("User Edited successfully:", "success");
         navigate("/home/content");

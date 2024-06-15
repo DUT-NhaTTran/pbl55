@@ -3,16 +3,19 @@ import defaultUserImage from "../Assets/default-avatar.png"; // Đường dẫn 
 import "../UserBookList/UserBookList.css";
 import axios from "axios";
 import UserBookListHeader from "./UserBookListHeader";
+import { getAuthInfo } from "../LoginForm/auth";
+import config from '../../config'; // Import file cấu hình
 
 
 const UserBookList = ({ selectedRecord }) => {
   const [borrowBooks, setBorrowBooks] = useState([]); // Sách được chọn
+  const { username } = getAuthInfo(); // Lấy username từ thông tin người dùng
 
   useEffect(() => {
     const fetchBookInfo = async () => {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/get_book_info?bookId=${selectedRecord.id}`
+          `${config.apiUrl}/get_our_book_info?bookId=${selectedRecord.id}&username=${username}`
         );
 
         // Kiểm tra phản hồi API và cập nhật state
@@ -58,7 +61,7 @@ const UserBookList = ({ selectedRecord }) => {
                   <strong className="profile_info">Book Name:</strong> {borrowBooks[0].book_name}
                 </div>
                 <div>
-                  <strong className="profile_info">Quantity:</strong> {borrowBooks[0].quantity}
+                  <strong className="profile_info">Total Borrowed Book: </strong> {borrowBooks[0].quantity}
                 </div>
                 <div>
                   <strong className="profile_info">Tag:</strong> {borrowBooks[0].tag}

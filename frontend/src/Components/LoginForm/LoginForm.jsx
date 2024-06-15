@@ -7,6 +7,8 @@ import axios from "axios";
 import { useState } from "react";
 import { setAuthInfo, getAuthInfo, clearAuthInfo } from "./auth";
 import { useNotification } from "../Noti/Noti";
+import config from '../../config'; // Import file cấu hình
+
 const LoginForm = () => {
   const handleForgotPasswordClick = () => {
     navigate("/changeaccount"); // Chuyển hướng người dùng đến trang ChangeAccount
@@ -17,7 +19,7 @@ const LoginForm = () => {
 
     if (errors.usernameTxt === "" && errors.passwordTxt === "") {
       axios
-        .post("http://127.0.0.1:8000/account", values)
+        .post(`${config.apiUrl}/account`, values)
         .then((res) => {
           console.log('Response data:', res.data);
           if (res.data.message === "Success") {

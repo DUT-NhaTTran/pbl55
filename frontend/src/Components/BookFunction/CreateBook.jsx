@@ -4,6 +4,8 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../Noti/Noti";
+import config from '../../config'; // Import file cấu hình
+
 const CreateBook = () => {
   const [id, setId] = useState("");
   const [bookName, setBookName] = useState("");
@@ -19,7 +21,7 @@ const CreateBook = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/get_tags");
+        const response = await axios.get(`${config.apiUrl}/get_tags`);
         setTag(response.data.tags);
       } catch (error) {
         console.error("Error fetching tags:", error);
@@ -96,7 +98,7 @@ const CreateBook = () => {
     try {
       // Gọi API và gửi formData
       const response = await axios.post(
-        "http://127.0.0.1:8000/save_book",
+        `${config.apiUrl}/save_book`,
         formData
       );
       showNotification("Book saved successfully.", "success");

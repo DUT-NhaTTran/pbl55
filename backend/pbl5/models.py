@@ -63,6 +63,7 @@ class Cards(models.Model):
     day_borrow = models.DateTimeField(blank=True, null=True)
     day_return = models.DateTimeField(blank=True, null=True)
     limit_day = models.IntegerField(blank=True, null=True)
+    bquantity=models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False

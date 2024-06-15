@@ -19,13 +19,15 @@ import EditStudentProfile from "./Components/EditProfile/EditStudentProfile";
 import StudentMagagement from "./Components/StudentList/StudentManagement";
 import StudentChecking from "./Components/StudentList/StudentChecking";
 import AdminDashboard from "./Components/AdminDashboard/AdminDashboard";
-import { getAuthInfo,clearAuthInfo } from "./Components/LoginForm/auth";
-import { BiHome, BiBookAlt, BiSolidReport, BiTask,BiExit } from "react-icons/bi";
+import {getAuthInfo,clearAuthInfo } from "./Components/LoginForm/auth";
+import {BiExit } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import CreateCheckin from "./Components/StudentList/CreateCheckin";
+
 ReactModal.setAppElement("#root");
 
 function App() {
+  
   return (
     <NotificationProvider>
       <BrowserRouter>
@@ -52,6 +54,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </NotificationProvider>
+
   );
 }
 

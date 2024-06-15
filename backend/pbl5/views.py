@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from urllib import request
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .serializers import *;
 from .models import *;
 from django.db import connections
 from rest_framework.views import APIView
@@ -22,12 +21,15 @@ from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 from django.utils import timezone
-from zoneinfo import ZoneInfo  # Sử dụng thư viện zoneinfo
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import make_aware
 from pytz import utc, timezone
-from datetime import timedelta
 from django.utils.timezone import make_aware, is_naive
+import pytz
+import traceback
+from datetime import datetime
+
+
 class AccountView(APIView):
     def post(self, request):
         username_txt = request.data.get('usernameTxt')
@@ -70,39 +72,24 @@ class AccountChangeView(APIView):
         else:
             return Response({'message': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
-
-import pytz
-
-from datetime import datetime
-
 class UserListView(APIView):
     def get(self, request):
         try:
-            selected_date = request.GET.get('selectedDate')  # Nhận selectedDate từ request
-            if selected_date:
+            selected_date = request.GET.get('selectedDate')
+
+            queryset = Users.objects.filter(isadmin=0)
+
+            if selected_date and selected_date.lower() != 'null':
                 selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
-                users = (
-                    Users.objects.filter(isadmin=0)
-                    .select_related('cid', 'cid__fid')  # Thực hiện join bảng Classes và Faculties
-                    .prefetch_related('checkin_set')     # Thực hiện join bảng CheckIn
-                    .filter(checkin__time_in__date=selected_date)  # Lọc bản ghi theo ngày
-                    .values(
-                        'uid', 'name', 'email', 'id', 'gender', 'birth',
-                        'cid__class_name', 'checkin__time_in', 'checkin__time_out', 'cid__fid__faculty_name'
-                    )
-                )
-            else:
-                # Trường hợp không có selectedDate, lấy tất cả người dùng
-                users = (
-                    Users.objects.filter(isadmin=0)
-                    .select_related('cid', 'cid__fid')  # Thực hiện join bảng Classes và Faculties
-                    .prefetch_related('checkin_set')     # Thực hiện join bảng CheckIn
-                    .values(
-                        'uid', 'name', 'email', 'id', 'gender', 'birth',
-                        'cid__class_name', 'checkin__time_in', 'checkin__time_out', 'cid__fid__faculty_name'
-                    )
-                )
+                queryset = queryset.filter(checkin__time_in__date=selected_date)
+
+            # Exclude records with null time_in or time_out
+            queryset = queryset.exclude(checkin__time_in__isnull=True).exclude(checkin__time_out__isnull=True)
+
+            users = queryset.values(
+                'uid', 'name', 'email', 'id', 'gender', 'birth',
+                'cid__class_name', 'checkin__time_in', 'checkin__time_out', 'cid__fid__faculty_name'
+            )
 
             results = []
             for user in users:
@@ -113,21 +100,18 @@ class UserListView(APIView):
                     'id': user['id'],
                     'gender': user['gender'],
                     'birth': user['birth'],
-                    'class_name': user['cid__class_name'] if user['cid__class_name'] else None,
-                    'faculty_name': user['cid__fid__faculty_name'] if user['cid__fid__faculty_name'] else None,
+                    'class_name': user.get('cid__class_name', None),
+                    'faculty_name': user.get('cid__fid__faculty_name', None),
                     'time_in': user['checkin__time_in'],
-                   
                     'time_out': user['checkin__time_out']
                 }
                 results.append(user_data)
+
             return JsonResponse(results, safe=False)
 
         except Exception as e:
             print("Error executing query:", e)
             return JsonResponse({'error': 'Error executing query'}, status=500)
-
-
-
 class UserManageView(APIView):
     def get(self, request):
         try:
@@ -154,7 +138,6 @@ class UserManageView(APIView):
         except Exception as e:
             print("Error fetching data:", e)
             return JsonResponse({'error': 'Error fetching data'}, status=500)
-import traceback
 def check_book_quantity(book, quantity):
     if book.quantity < quantity:
         return Response(
@@ -166,84 +149,87 @@ def check_book_quantity(book, quantity):
         )
     return None
 
-class SaveCheckin(APIView):
-    def post(self, request):
-        try:
-            uid = request.data.get('uid')
-            startDateTime = datetime.strptime(request.data.get('startDateTime'), '%Y-%m-%d %H:%M:%S')
-            endDateTime = datetime.strptime(request.data.get('endDateTime'), '%Y-%m-%d %H:%M:%S')
-            bookId = request.data.get('bookId')
-            quantity = int(request.data.get('quantity', 1))
-            limitDay = request.data.get('limitDay')
-            mode = request.data.get('mode')
-            current_tz = ZoneInfo(timezone.get_current_timezone_name())
-            startDateTime = startDateTime.replace(tzinfo=current_tz)
-            endDateTime = endDateTime.replace(tzinfo=current_tz)
-            print("in",uid,startDateTime,endDateTime,bookId,quantity,limitDay,mode)
+# class SaveCheckin(APIView):
+#     def post(self, request):
+#         try:
+#             uid = request.data.get('uid')
+#             startDateTime = datetime.strptime(request.data.get('startDateTime'), '%Y-%m-%d %H:%M:%S')
+#             endDateTime = datetime.strptime(request.data.get('endDateTime'), '%Y-%m-%d %H:%M:%S')
+#             bookId = request.data.get('bookId')
+#             quantity = int(request.data.get('quantity', 1))
+#             limitDay = request.data.get('limitDay')
+#             mode = request.data.get('mode')
+#             current_tz = ZoneInfo(timezone.get_current_timezone_name())
+#             startDateTime = startDateTime.replace(tzinfo=current_tz)
+#             endDateTime = endDateTime.replace(tzinfo=current_tz)
+#             print("in",uid,startDateTime,endDateTime,bookId,quantity,limitDay,mode)
 
-            user = Users.objects.filter(uid=uid, isadmin=0).first()
+#             user = Users.objects.filter(uid=uid, isadmin=0).first()
             
-            if not user:
-                return Response({'error': 'UID not found in User'}, status=status.HTTP_404_NOT_FOUND)
+#             if not user:
+#                 return Response({'error': 'UID not found in User'}, status=status.HTTP_404_NOT_FOUND)
            
-            book = Books.objects.filter(id=bookId).first()
-            if not book:
-                return Response({'error': 'BookId not found in Books'}, status=status.HTTP_404_NOT_FOUND)
+#             book = Books.objects.filter(id=bookId).first()
+#             if not book:
+#                 return Response({'error': 'BookId not found in Books'}, status=status.HTTP_404_NOT_FOUND)
 
-            if mode == 'Borrow':
-                print("bo")
-                response = check_book_quantity(book, quantity)
-                if response:
-                    return response
+#             if mode == 'Borrow':
+#                 print("bo")
+#                 response = check_book_quantity(book, quantity)
+#                 if response:
+#                     return response
 
-                card = Cards.objects.create(
-                    sid=user,
-                    bid=book,
-                    day_borrow=startDateTime,
-                    day_return=None,
-                    limit_day=limitDay
-                )
-                print("Borrow card created")
+#                 card = Cards.objects.create(
+#                     sid=user,
+#                     bid=book,
+#                     day_borrow=startDateTime,
+#                     day_return=None,
+#                     limit_day=limitDay,
+#                     bquantity=quantity
+#                 )
+#                 print("Borrow card created")
 
-                book.quantity -= quantity
+#                 book.quantity -= quantity
 
-            elif mode == 'Return':
-                print('re')
-                card = Cards.objects.filter(sid=user, bid=book, day_return=None).first()
-                if not card:
-                    return Response({'error': 'No active borrow record found for this user and book'}, status=status.HTTP_400_BAD_REQUEST)
+#             elif mode == 'Return':
+#                 print('re')
+#                 card = Cards.objects.filter(sid=user, bid=book, day_return=None).first()
+#                 if not card:
+#                     return Response({'error': 'No active borrow record found for this user and book'}, status=status.HTTP_400_BAD_REQUEST)
 
-                card.day_return = endDateTime
-                card.save()
-                print("Return card updated")
+#                 card.day_return = endDateTime
+#                 card.save()
+#                 print("Return card updated")
 
-                book.quantity += quantity
-            else:
-                return Response({'error': 'Invalid mode'}, status=status.HTTP_400_BAD_REQUEST)
+#                 book.quantity += quantity
+#             else:
+#                 return Response({'error': 'Invalid mode'}, status=status.HTTP_400_BAD_REQUEST)
 
-            book.save()
-            checkin = Checkin.objects.create(
-                uid=user,
-                time_in=startDateTime,
-                time_out=endDateTime,
-            )
-            if checkin:
-                return Response({
-                    'success': 'Checkin saved successfully',
-                    'checkin_id': checkin.chid,
-                    'user_id': user.uid
-                }, status=status.HTTP_201_CREATED)
-            else:
-                return Response({'error': 'Failed to save checkin'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#             book.save()
+#             checkin = Checkin.objects.create(
+#                 uid=user,
+#                 time_in=startDateTime,
+#                 time_out=endDateTime,
+#             )
+#             if checkin:
+#                 return Response({
+#                     'success': 'Checkin saved successfully',
+#                     'checkin_id': checkin.chid,
+#                     'user_id': user.uid
+#                 }, status=status.HTTP_201_CREATED)
+#             else:
+#                 return Response({'error': 'Failed to save checkin'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-        except Exception as e:
-            traceback.print_exc()  
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         except Exception as e:
+#             traceback.print_exc()  
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 # class SaveCheckin(APIView):
 #     def post(self, request):
 #         try:
 #             data = request.data
+#             print(data)
+
 #             uid = data.get('uid')
 #             time_in = datetime.strptime(data.get('time_in'), '%Y-%m-%d %H:%M:%S')
 #             time_out = datetime.strptime(data.get('time_out'), '%Y-%m-%d %H:%M:%S')
@@ -252,15 +238,15 @@ class SaveCheckin(APIView):
 
 #             user = Users.objects.filter(uid=uid, isadmin=0).first()
 #             if not user:
-#                 return Response({'error': 'UID not found in User'}, status=status.HTTP_404_NOT_FOUND)
+#                 return Response({'Error': 'UID not found in User'}, status=status.HTTP_404_NOT_FOUND)
             
 #             if mode not in ['Borrow', 'Return']:
-#                 return Response({'error': 'Invalid mode'}, status=status.HTTP_400_BAD_REQUEST)
+#                 return Response({'Error': 'Invalid mode'}, status=status.HTTP_400_BAD_REQUEST)
             
 #             for book_id, quantity in books.items():
 #                 book = Books.objects.filter(id=book_id).first()
 #                 if not book:
-#                     return Response({'error': f'BookId {book_id} not found in Books'}, status=status.HTTP_404_NOT_FOUND)
+#                     return Response({'Error': f'BookId {book_id} not found in Books'}, status=status.HTTP_404_NOT_FOUND)
 
 #                 if mode == 'Borrow':
 #                     response = check_book_quantity(book, quantity)
@@ -272,20 +258,21 @@ class SaveCheckin(APIView):
 #                         bid=book,
 #                         day_borrow=time_in,
 #                         day_return=None,
-#                         limit_day=None  # You may need to adjust this based on your requirements
+#                         limit_day=20,
+#                         bquantity=quantity
 #                     )
-#                     print(f"Borrow card created for Book ID {book_id}")
 
 #                     book.quantity -= quantity
 
 #                 elif mode == 'Return':
 #                     card = Cards.objects.filter(sid=user, bid=book, day_return=None).first()
 #                     if not card:
-#                         return Response({'error': f'No active borrow record found for User ID {uid} and Book ID {book_id}'}, status=status.HTTP_400_BAD_REQUEST)
+#                         return Response({'Error': f'No active borrow record found for User ID {uid} and Book ID {book_id}'}, status=status.HTTP_400_BAD_REQUEST)
+#                     if quantity > card.bquantity:
+#                         return Response({'Error': f'Return quantity for Book ID {book_id} exceeds borrowed quantity'}, status=status.HTTP_400_BAD_REQUEST)
 
 #                     card.day_return = time_out
 #                     card.save()
-#                     print(f"Return card updated for Book ID {book_id}")
 
 #                     book.quantity += quantity
 
@@ -302,14 +289,88 @@ class SaveCheckin(APIView):
 
 #         except Exception as e:
 #             traceback.print_exc()  
-#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#             return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+class SaveCheckin(APIView):
+    def post(self, request):
+        try:
+            data = request.data
+            print(data)
 
-def check_book_quantity(book, quantity):
-    if book.quantity < quantity:
-        return Response({'error': f'Not enough quantity available for Book ID {book.id}'}, status=status.HTTP_400_BAD_REQUEST)
-    return None
+            uid = data.get('uid')
+            time_in = datetime.strptime(data.get('time_in'), '%Y-%m-%d %H:%M:%S')
+            time_out = datetime.strptime(data.get('time_out'), '%Y-%m-%d %H:%M:%S')
+            mode = data.get('mode')
+            books = data.get('books')
 
-        
+            user = Users.objects.filter(uid=uid, isadmin=0).first()
+            if not user:
+                return Response({'Error': 'UID not found in User'}, status=status.HTTP_404_NOT_FOUND)
+            
+            if mode not in ['Borrow', 'Return']:
+                return Response({'Error': 'Invalid mode'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            for book_id, quantity in books.items():
+                book = Books.objects.filter(id=book_id).first()
+                if not book:
+                    return Response({'Error': f'BookId {book_id} not found in Books'}, status=status.HTTP_404_NOT_FOUND)
+
+                if mode == 'Borrow':
+                    response = check_book_quantity(book, quantity)
+                    if response:
+                        return response
+
+                    card = Cards.objects.create(
+                        sid=user,
+                        bid=book,
+                        day_borrow=time_in,
+                        day_return=None,
+                        limit_day=20,
+                        bquantity=quantity
+                    )
+
+                    book.quantity -= quantity
+
+                elif mode == 'Return':
+                    card = Cards.objects.filter(sid=user, bid=book,day_return=None).first()
+                    if not card:
+                        return Response({'Error': f'No active borrow record found for User ID {uid} and Book ID {book_id}'}, status=status.HTTP_400_BAD_REQUEST)
+                    if quantity > card.bquantity:
+                        return Response({'Error': f'Return quantity for Book ID {book_id} exceeds borrowed quantity'}, status=status.HTTP_400_BAD_REQUEST)
+
+                    # Update card and book quantities based on returned quantity
+                    returned_quantity = quantity
+                    
+                    card.bquantity -= returned_quantity
+                    card.day_return=time_out
+                    card.save()
+
+                    book.quantity += returned_quantity
+
+                    # If there are remaining books to be returned, create a new card for them
+                    # if remaining_quantity > 0:
+                    #     new_card = Cards.objects.create(
+                    #         sid=user,
+                    #         bid=book,
+                    #         day_borrow=time_in,
+                    #         day_return=None,
+                    #         limit_day=20,
+                    #         bquantity=remaining_quantity
+                    #     )
+
+                book.save()
+
+            checkin = Checkin.objects.create(
+                uid=user,
+                time_in=time_in,
+                time_out=time_out,
+            )
+            print("checkin")
+
+            return Response({'success': 'Checkin saved successfully'}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            traceback.print_exc()  
+            return Response({'Error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class UserCheckingView(APIView):
     def get(self,response):
         try:
@@ -406,7 +467,6 @@ class UserSearchView(APIView):
 class UserDeleteView(APIView):
     def delete(self, request):
         if request.method == 'DELETE':
-            print("xóa")
             try:
                 data = json.loads(request.body)
                 uids = data.get('uids')
@@ -437,6 +497,32 @@ class UserDeleteView(APIView):
 
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+
+# class UserDeleteCheckinView(APIView):
+#     def delete(self, request):
+#         if request.method == 'DELETE':
+#             try:
+#                 data = json.loads(request.body)
+#                 uids = data.get('uids')
+#                 print("Xóa ",uids)
+#                 if not uids or not isinstance(uids, list):
+#                     return JsonResponse({'error': 'No uids provided or uids is not a list'}, status=400)
+
+#                 for uid in uids:
+#                     Checkin.objects.filter(uid=uid).delete()
+#                     Cards.objects.filter(sid=uid).delete()
+                    
+#                 return JsonResponse({'message': 'Records deleted successfully'}, status=200)
+
+#             except json.JSONDecodeError:
+#                 return JsonResponse({'error': 'Invalid JSON format'}, status=400)
+
+#             except Exception as e:
+#                 traceback.print_exc()
+#                 print(f"Error processing request: {e}")
+#                 return JsonResponse({'error': 'An error occurred while processing the request'}, status=500)
+
+#         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 class GetFidView(APIView):
     def get(self, request):
@@ -801,11 +887,10 @@ class ViewBorrowBooks(APIView):
 
         try:
             borrow_books = Cards.objects.filter(sid=uid).values(
-                'bid__id', 'bid__book_name', 'day_borrow', 'day_return', 'limit_day'
+                'bid__id', 'bid__book_name', 'day_borrow', 'day_return', 'limit_day','bquantity'
             )
 
             if not borrow_books.exists():
-                print(f"No records found for UID: {uid}")
                 return JsonResponse({'message': 'No records found'}, status=200)
 
             borrow_book_info_list = []
@@ -816,6 +901,8 @@ class ViewBorrowBooks(APIView):
                     'day_borrow': book['day_borrow'],
                     'day_return': book['day_return'],
                     'limit_day': book['limit_day'],
+                    'bquantity':book['bquantity']
+
                 }
                 borrow_book_info_list.append(borrow_book_info)
 
@@ -888,20 +975,21 @@ class GetUserInfo(APIView):
     def get(self, request):
         try:
             uid = request.GET.get('uid')
-
+            print("uid nè ",uid)
             # Kiểm tra uid có tồn tại không
             if not uid:
                 return Response({'error': 'UID not provided'}, status=status.HTTP_400_BAD_REQUEST)
 
             user = get_object_or_404(Users.objects.select_related('cid', 'cid__fid'), uid=uid)
-
+            username = user.name 
+            welcome_sentence = f"Xin chào {username}, chào mừng bạn đến với thư viện!"
             avatar_data = Avatars.objects.filter(uid=user).first()
 
             # Nếu có dữ liệu ảnh, chuyển đổi nó sang Base64
             avatar_base64 = None
+
             if avatar_data and avatar_data.image:
                 avatar_base64 = base64.b64encode(avatar_data.image).decode('utf-8')
-
             user_info = {
                 'uid': user.uid,
                 'name': user.name,
@@ -912,7 +1000,10 @@ class GetUserInfo(APIView):
                 'fid': user.cid.fid.faculty_name if user.cid and user.cid.fid else None,
                 'is_admin': user.isadmin,
                 'class_name': user.cid.class_name if user.cid else None,
-                'avatar': avatar_base64,
+                'welcome_sentence': welcome_sentence,
+                'avatar': avatar_base64
+               
+
             }
 
             # Trả về thông tin người dùng dưới dạng JSON
@@ -961,8 +1052,54 @@ class GetBookInfo(APIView):
 
         except Exception as e:
             return JsonResponse({'error': 'Error fetching book info'}, status=500)
+class GetOurBookInfo(APIView):
+    def get(self, request):
+        try:
+            book_id = request.GET.get('bookId')
+            username = request.GET.get('username')
+            print(username)
+            if not book_id:
+                return JsonResponse({'error': 'Book ID not provided'}, status=400)
 
+            # Fetch the book object
+            book = Books.objects.filter(id=book_id).first()
 
+            if not book:
+                return JsonResponse({'error': 'Book not found'}, status=404)
+            
+            # Fetch all borrow_book objects for the given user and book
+            borrow_books = Cards.objects.filter(bid=book_id, sid=username).order_by('-day_borrow')
+
+            if not borrow_books.exists():
+                return JsonResponse({'error': 'Borrow information not found'}, status=404)
+            
+            # Calculate total borrowed quantity
+            total_borrowed_quantity = borrow_books.aggregate(total_quantity=Sum('bquantity'))['total_quantity']
+            if total_borrowed_quantity is None:
+                total_borrowed_quantity = 0
+
+            # Fetch the book image object
+            book_image_obj = Bookimages.objects.filter(bid=book_id).first()
+            book_image = book_image_obj.book_image if book_image_obj else None
+
+            # Convert the image to base64 if it exists
+            image_base64 = base64.b64encode(book_image).decode('utf-8') if book_image else None
+
+            # Prepare the book info dictionary
+            book_info = {
+                'book_id': book.id,
+                'book_name': book.book_name,
+                'auth': book.auth,
+                'quantity': total_borrowed_quantity,
+                'tag': book.tag,
+                'description': book.description,
+                'book_image': image_base64,
+            }
+
+            return JsonResponse(book_info)
+
+        except Exception as e:
+            traceback.print_exc()
 class EditBook(APIView):
     def post(self, request):
         try:
@@ -989,7 +1126,6 @@ class EditBook(APIView):
             
             # Cập nhật ảnh sách nếu có
             if book_image:
-                print("ảnh")
                 book_image_obj = Bookimages.objects.get(bid=book_id)
                 book_image_obj.book_image = book_image.read()
                 book_image_obj.save()
@@ -1118,33 +1254,6 @@ class GetCategoriesAndCounts(APIView):
         except Exception as e:
             print("Error executing query:", e)
             return JsonResponse({'error': 'Error executing query'}, status=500)
-
-
-from django.db.models import Q, F, ExpressionWrapper, DateTimeField
-
-
-from django.db.models import Q, F, ExpressionWrapper, DateTimeField
-from django.utils import timezone
-from django.utils.dateparse import parse_date
-from rest_framework.views import APIView
-from django.http import JsonResponse
-from .models import Users
-import traceback
-from datetime import timedelta
-from django.http import JsonResponse
-from django.views.generic import View
-from .models import Users, Classes, Cards, Faculties
-from datetime import datetime, timedelta
-from django.db.models import Q, F, ExpressionWrapper, DurationField
-from django.utils import timezone
-
-from django.http import JsonResponse
-from django.views.generic import View
-from .models import Users, Classes, Cards, Faculties
-from datetime import datetime, timedelta
-from django.utils import timezone
-from django.db.models.functions import Cast, ExtractDay
-from django.db.models import Q, F, ExpressionWrapper, DateTimeField, IntegerField  # Import IntegerField
 
 class UserCheckingData(APIView):
     def get(self, request):

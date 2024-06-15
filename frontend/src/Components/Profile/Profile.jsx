@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ProfileHeader from "./ProfileHeader";
 import "../Profile/Profile.css";
-// import "../BookList/modal.css";
+import config from '../../config'; // Import file cấu hình
 import defaultUserImage from "../Assets/default-avatar.png"; // Đường dẫn đến ảnh mặc định
 import { format } from "date-fns";
 import axios from "axios";
 import ReactModal from "react-modal";
 import DataTable from "react-data-table-component";
+import { toZonedTime } from 'date-fns-tz';
 
 const Profile = ({ selectedRecord }) => {
   const suid = selectedRecord.uid;
@@ -25,11 +26,22 @@ const Profile = ({ selectedRecord }) => {
       },
       {
         name: "Day Borrowed",
-        selector: (row) => format(new Date(row.day_borrow), "dd-MM-yyyy"),
+        // selector: (row) => format(new Date(row.day_borrow), "dd-MM-yyyy"),
+        selector: (row) => {
+          const date = toZonedTime(new Date(row.day_borrow), 'UTC');
+          return format(date, 'dd-MM-yyyy');
+        },
       },
       {
         name: "Day Return",
-        selector: (row) => row.day_return ? format(new Date(row.day_return), "dd-MM-yyyy") : ""
+        // selector: (row) => row.day_return ? format(new Date(row.day_return), "dd-MM-yyyy") : ""
+        selector: (row) => {
+          if (!row.day_return) {
+            return ""; // hoặc bạn có thể trả về chuỗi rỗng "" nếu muốn
+          }
+          const date = toZonedTime(new Date(row.day_return), 'UTC');
+          return format(date, 'dd-MM-yyyy');
+        },
 
       },
       {
@@ -50,7 +62,7 @@ const Profile = ({ selectedRecord }) => {
     // Hàm để gọi API và cập nhật `borrowBooks`
     const handleViewBorrowBook = () => {
       axios
-        .get(`http://127.0.0.1:8000/view_borrow_books?uid=${suid}`)
+        .get(`${config.apiUrl}/view_borrow_books?uid=${suid}`)
         .then((res) => {
           // Kiểm tra kết quả của API để đảm bảo rằng dữ liệu hợp lệ
           if (res.data && Array.isArray(res.data)) {
@@ -77,7 +89,7 @@ const Profile = ({ selectedRecord }) => {
     useEffect(() => {
       if (selectedRecord) {
         axios
-          .post("http://127.0.0.1:8000/get_avatar_url", {
+          .post(`${config.apiUrl}/get_avatar_url`, {
             sr: selectedRecord.uid,
           })
           .then((response) => {

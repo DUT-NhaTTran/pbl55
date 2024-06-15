@@ -4,6 +4,7 @@ import "../Create/Create.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useNotification } from "../Noti/Noti";
+import config from '../../config'; // Import file cấu hình
 
 const CreateCheckin = () => {
   const navigate = useNavigate();
@@ -37,8 +38,8 @@ const CreateCheckin = () => {
 
     const data = {
       uid,
-      startDateTime: formattedStartTime,
-      endDateTime: formattedEndTime,
+      time_in: formattedStartTime,
+      time_out: formattedEndTime,
       bookId,
       quantity,
       mode,
@@ -52,7 +53,7 @@ const CreateCheckin = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/save_checkin",
+        `${config.apiUrl}/save_checkin`,
         data
       );
 

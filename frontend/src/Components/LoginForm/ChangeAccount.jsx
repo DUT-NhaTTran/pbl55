@@ -6,6 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ChangeValidation from "./ChangeValidation";
 import { useNotification } from "../Noti/Noti";
+import config from '../../config'; // Import file cấu hình
 
 const ChangeAccount = () => {
   const [values, setValues] = useState({
@@ -35,7 +36,7 @@ const ChangeAccount = () => {
       try {
         // Gửi yêu cầu POST
         const response = await axios.post(
-          "http://127.0.0.1:8000/account_change",
+          `${config.apiUrl}/account_change`,
           values
         );
 

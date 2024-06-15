@@ -47,18 +47,12 @@ const SideBar = () => {
               <BiSolidReport className="icon" />
               Student Management
             </Link>
-            {/* <Link to="/home/studentchecking" className="item">
-              <BiSolidReport className="icon" />
-              Student Checking
-            </Link> */}
+            
             <Link to="/home/admindashboard" className="item">
               <BiSolidReport className="icon" />
               Admin Dashboard
             </Link>
-            {/* <Link to="/home/create" className="item">
-              <BiTask className="icon" />
-              Create
-            </Link> */}
+            
           </>
         ) : null}{" "}
 

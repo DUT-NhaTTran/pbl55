@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cards from "./Cards";
 import { IoBook, IoBookSharp, IoCart, IoCash, IoPeople } from "react-icons/io5";
+import config from '../../../config'; // Import file cấu hình
 
 const CardList = ({ selectedDateTime }) => {
   const [booksCount, setBooksCount] = useState(null);
@@ -26,7 +27,7 @@ const CardList = ({ selectedDateTime }) => {
     const getBooksCount = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/get_books_count",
+          `${config.apiUrl}/get_books_count`,
           {
             params: {
               date: selectedDateTime,
@@ -43,7 +44,7 @@ const CardList = ({ selectedDateTime }) => {
     const getCheckinCount = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/get_checkin_count",
+          `${config.apiUrl}/get_checkin_count`,
           {
             params: {
               date: selectedDateTime,
@@ -59,7 +60,7 @@ const CardList = ({ selectedDateTime }) => {
     const getBorrowedBooksCount = async () => {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8000/get_borrow_book_count",
+          `${config.apiUrl}/get_borrow_book_count`,
           {
             params: {
               date: selectedDateTime,
@@ -75,7 +76,7 @@ const CardList = ({ selectedDateTime }) => {
       try {
         if (formattedDate === selectedDateTime) {
           const booksResponse = await axios.get(
-            "http://127.0.0.1:8000/get_books_count",
+            `${config.apiUrl}/get_books_count`,
             {
               params: {
                 date: formattedDate,
@@ -85,7 +86,7 @@ const CardList = ({ selectedDateTime }) => {
           setCurrentBooksCount(booksResponse.data.total_books);
 
           const checkinResponse = await axios.get(
-            "http://127.0.0.1:8000/get_checkin_count",
+            `${config.apiUrl}/get_checkin_count`,
             {
               params: {
                 date: formattedDate,
@@ -95,7 +96,7 @@ const CardList = ({ selectedDateTime }) => {
           setCurrentCheckinCount(checkinResponse.data.total_checkin);
 
           const borrowedBooksResponse = await axios.get(
-            "http://127.0.0.1:8000/get_borrow_book_count",
+            `${config.apiUrl}/get_borrow_book_count`,
             {
               params: {
                 date: formattedDate,

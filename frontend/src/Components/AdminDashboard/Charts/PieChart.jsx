@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Chart from 'react-apexcharts';
 import axios from "axios";
+import config from '../../../config'; // Import file cấu hình
 
 const PieChart = ({ selectedDateTime }) => {
   const [checkinCount, setCheckinCount] = useState(0);
@@ -12,10 +13,10 @@ const PieChart = ({ selectedDateTime }) => {
     const fetchData = async () => {
       try {
         setLoading(true); // Đánh dấu đang tải dữ liệu
-        const checkinResponse = await axios.get("http://127.0.0.1:8000/user_checking_data", {
+        const checkinResponse = await axios.get(`${config.apiUrl}/user_checking_data`, {
           params: { date: selectedDateTime }
         });
-        const borrowedBooksResponse = await axios.get("http://127.0.0.1:8000/get_borrow_book_count", {
+        const borrowedBooksResponse = await axios.get(`${config.apiUrl}/get_borrow_book_count`, {
           params: { date: selectedDateTime }
         });
         

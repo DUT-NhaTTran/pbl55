@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../BookFunction/CreateBook.css";
 import { useNotification } from "../Noti/Noti";
+import config from '../../config'; // Import file cấu hình
 
 const defaultBookImage = "https://via.placeholder.com/150"; // Đường dẫn ảnh mặc định
 
@@ -37,7 +38,7 @@ const EditBook = () => {
   useEffect(() => {
     if (send_bookId) {
       axios
-        .get(`http://127.0.0.1:8000/get_book_info?bookId=${send_bookId}`)
+        .get(`${config.apiUrl}/get_book_info?bookId=${send_bookId}`)
         .then((response) => {
           const bookData = response.data;
           // Cập nhật state với thông tin sách từ back-end
@@ -61,7 +62,7 @@ const EditBook = () => {
   // Lấy dữ liệu danh mục từ back-end
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/get_tags")
+      .get(`${config.apiUrl}/get_tags`)
       .then((response) => {
         if (response.data && Array.isArray(response.data.tags)) {
           setCategoryList(response.data.tags);
@@ -87,7 +88,7 @@ const EditBook = () => {
     }
 
     axios
-      .post("http://127.0.0.1:8000/edit_book", formData)
+      .post(`${config.apiUrl}/edit_book", formData`)
       .then((response) => {
         showNotification("Book edited successfully:", "success");
         navigate("/home/booklist");
